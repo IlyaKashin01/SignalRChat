@@ -1,0 +1,12 @@
+<h1>SignalRChat</h1>
+<input (keyup)="onKey($event)">
+<button (click)="sendMessage(inputValue)">Send message</button>
+<!-- <button (click)="showAllPersonalMessages()">Show messages</button> -->
+<!-- <input (keyup)="onKey($event)">
+<button (click)="joinGroup(inputValue)">Join group</button> -->
+<div *ngFor="let message of personalMessages">
+    <p>{{ message.content}} {{ message.sentAt }}</p>
+</div>
+<!-- <div *ngFor="let message of groupMessages">
+    {{ message }}
+</div> -->

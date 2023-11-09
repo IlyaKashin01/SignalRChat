@@ -1,0 +1,13 @@
+<h2>Страница авторизации</h2>
+
+<div>
+    <label for="username">Логин:</label>
+    <input type="text" id="username" (keyup)="onKeyLogin($event)">
+</div>
+
+<div>
+    <label for="password">Пароль:</label>
+    <input type="password" id="password" (keyup)="onKeyPass($event)">
+</div>
+
+<button (click)="login()">Войти</button>

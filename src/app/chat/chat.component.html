@@ -1,12 +1,11 @@
 <h1>SignalRChat</h1>
-<input (keyup)="onKey($event)">
-<button (click)="sendMessage(inputValue)">Send message</button>
-<!-- <button (click)="showAllPersonalMessages()">Show messages</button> -->
-<!-- <input (keyup)="onKey($event)">
-<button (click)="joinGroup(inputValue)">Join group</button> -->
-<div *ngFor="let message of personalMessages">
-    <p>{{ message.content}} {{ message.sentAt }}</p>
+<div *ngFor="let dialog of dialogs">
+    <button (click)="onKeyRecipientId(dialog.id)">{{ dialog.login}} {{ dialog.email }}</button>
 </div>
-<!-- <div *ngFor="let message of groupMessages">
-    {{ message }}
-</div> -->
+<div *ngIf="show">
+    <input (keyup)="onKey($event)">
+    <button (click)="sendMessage(inputValue)">Send message</button>
+    <div *ngFor="let message of personalMessages">
+        <p>{{ message.content}} {{ message.senderId }}</p>
+    </div>
+</div>

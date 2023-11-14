@@ -3,7 +3,7 @@ export class AuthResponse {
 }
 
 export class PersonResponse {
-    constructor(public Id: number, public Login: string, public Email: string) { }
+    constructor(public id: number, public login: string, public email: string) { }
 }
 
 export class AuthRequest {

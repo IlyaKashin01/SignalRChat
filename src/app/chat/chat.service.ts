@@ -1,73 +1,72 @@
 import { Injectable } from "@angular/core";
-import { HubConnection, HubConnectionBuilder } from "@aspnet/signalr";
-import { TokenService } from "../data.service";
-import { HttpHeaders } from "@angular/common/http";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { HubConnection, } from "@aspnet/signalr";
+import { DataService } from "../data.service";
+import { BehaviorSubject, } from "rxjs";
+import { GetMessagesRequest, Message, SendMessageRequest } from "./Dto";
+import { HubService } from "../hub.service";
 import { PersonResponse } from "../signin/authDto";
-import { Message } from "./messageDto";
 
 @Injectable()
 export class ChatService {
-    constructor(private tokenService: TokenService) { }
-    private messages: string[] = [];
+    constructor(private dataService: DataService, private hubService: HubService) { }
     private personalMessages: Message[] = [];
     private personalMessagesSource = new BehaviorSubject<Message[]>([]);
     personalmessages$ = this.personalMessagesSource.asObservable();
-    private messageSource = new BehaviorSubject<string[]>([]);
-    messages$ = this.messageSource.asObservable();
-    groupMessages: string[] = [];
-    token: string = "";
-    personId: number = this.tokenService.getPersonId()
-    private hubConnection: HubConnection = new HubConnectionBuilder()
-        .withUrl(`https://localhost:7130/chat?access_token=${this.tokenService.getToken()}`)
-        .build();
-    connect() {
-        console.log(this.tokenService.getToken())
-        this.hubConnection.start()
-            .then(() => console.log('Подключение к хабу SignalR успешно установлено'))
-            .catch(err => console.error('Ошибка подключения к хабу SignalR:', err,));
-    }
-    async sendMessage(message: string) {
-        await this.hubConnection.invoke('SendPersonalMessage', this.personId, 2, message)
-            .then(() => console.log('Сообщение отправлено'))
-            .catch(error => console.error(`Ошибка при отправке сообщения от ${this.personId}:`, error));
-    }
-    getAllPersonalMessagesInvoke() {
-        this.hubConnection.invoke("GetAllPersonalMessages", 1, 2)
-            .catch(err => console.error(err));
-    }
-    getAllPersonalMessages() {
+    private message: Message = new Message(0, 0, "", new Date, false);
+    private messageSource = new BehaviorSubject<Message>(new Message(0, 0, "", new Date, false));
+    message$ = this.messageSource.asObservable();
+    private personId: number = this.dataService.getPersonId();
+    private hubConnection: HubConnection = this.hubService.Connection();
+    dialogs: PersonResponse[] = [];
+    private dialogsSourse = new BehaviorSubject<PersonResponse[]>([]);
+    dialogs$ = this.dialogsSourse.asObservable();
 
-        this.hubConnection.on("AllPersonalMessageInDialog", (messages: Message[]) => {
+    async getConnection() { return await this.hubService.getPromiseSrart(); }
+    async sendMessage(message: string, recipientId: number) {
+        await this.hubService.Invoke(
+            'SendPersonalMessage',
+            new SendMessageRequest(this.personId, recipientId, message, false),
+            `Ошибка при отправке сообщения от ${this.personId}:`,
+            'сообщение отправлено'
+        );
+    }
+    async subscribeNewPersonalMessages() {
+        this.hubConnection.on('NewMessage', (message: Message) => {
+            this.message = message;
+            this.messageSource.next(this.message);
+            this.personalMessages.push(this.message)
+            this.personalMessagesSource.next(this.personalMessages)
+            console.log('новое сообщение:', message);
+        });
+    }
+    async getAllPersonalMessages(recipientId: number) {
+        await this.hubService.Invoke(
+            "GetAllPersonalMessages",
+            new GetMessagesRequest(this.personId, recipientId),
+            `Ошибка при получении сообщений между ${this.personId} и ${recipientId}`,
+            `Загружен диалог между ${this.personId} и ${recipientId}`
+        )
+    }
+    async subscribeAllPersonalMessages() {
+        await this.hubConnection.on("AllPersonalMessageInDialog", (messages: Message[]) => {
             this.personalMessages = messages;
             this.personalMessagesSource.next(this.personalMessages);
-            console.log('получено сообщений из бд:', messages);
+            console.log('сообщения из бд:', messages);
         });
     }
-    joinGroup(name: string) {
-        this.hubConnection.invoke('JoinGroup', name)
-            .then(() => console.log('Пользователь добавлен в группу'))
-            .catch(error => console.error('Ошибка при добавлении к группе:', error));
-    }
-    getMessages() {
-        this.hubConnection.on("PersonalMessage", (message) => {
-            this.messages.push(message);
-            this.messageSource.next(this.messages);
-            console.log('Получено новое сообщение из SignalR:', message);
+    async subscribeDialogs() {
+        await this.hubConnection.on('AllDialogs', (dialogs: PersonResponse[]) => {
+            this.dialogs = dialogs;
+            this.dialogsSourse.next(this.dialogs);
+            console.log('диалоги из бд:', this.dialogs);
         });
     }
-    getList() { return this.messageSource.getValue() }
-    // showAllPersonalMessages() {
-    //     this.getAllPersonalMessages();
-    //     this.hubConnection.on("AllPersonalMessageInDialog", (message) => {
-    //         this.messages.push(message);
-    //         console.log('Получено новое сообщение из SignalR:', message);
-    //     });
-    // }
-    getGroupMessages() {
-        this.hubConnection.on("ReceiveMessage", (message) => {
-            this.groupMessages.push(message);
-            console.log('Получено новое сообщение из SignalR:', message);
-        });
+    async getDialogs() {
+        await this.hubService.Invoke(
+            'GetAllPersonalDialogs',
+            this.dataService.getPersonId(),
+            'dialogs does not exist',
+            'получен список диалогов'
+        )
     }
 }

@@ -1,0 +1,9 @@
+<h1>SignalRChat</h1>
+<input (keyup)="onKey($event)">
+<button (click)="createGroup(inputValue)">Join group</button>
+<input (keyup)="onKey($event)">
+<button (click)="sendGroupMessage(inputValue)">Send message to group</button>
+<button (click)="joinPersonToGroup()">Join group</button>
+<div *ngFor="let message of groupMessages">
+    <p>{{ message.content}} {{ message.sentAt }}</p>
+</div>

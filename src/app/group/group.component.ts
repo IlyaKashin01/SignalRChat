@@ -1,34 +1,52 @@
 import { Component, OnInit } from '@angular/core';
 import { GroupService } from './group.service';
-import { GroupMessage } from './Dto';
+import { GroupMessage, GroupedMessagesInGroup } from './Dto';
+import { DataService } from '../data.service';
 
 @Component({
-    selector: 'signin',
+    selector: 'group',
     templateUrl: './group.component.html',
     styleUrls: ['./group.component.css'],
     providers: [GroupService]
 })
 export class GroupComponent implements OnInit {
     inputValue: string = "";
-    groupMessages: GroupMessage[] = [];
 
-    constructor(private chatHub: GroupService,) {
+    groupMessages: GroupedMessagesInGroup[] = [];
+    newMessage: GroupMessage | undefined;
+
+    personId: number = this.dataService.getPersonId();
+    isOpen: boolean = false;
+
+    constructor(private chatHub: GroupService, private dataService: DataService) {
+    }
+
+    async ngOnInit(): Promise<void> {
+        await this.chatHub.subscribeGroupMessages();
+        await this.chatHub.subscribeNewGroupMessages();
+        await this.chatHub.getGroupMessages();
+        this.chatHub.groupmessages$.subscribe((messages: GroupedMessagesInGroup[]) => {
+            this.groupMessages = messages;
+        });
+        this.chatHub.message$.subscribe((message: GroupMessage) => {
+            this.newMessage = message;
+        });
     }
     onKey(event: any) {
         this.inputValue = event.target.value;
     }
-
-    async ngOnInit(): Promise<void> {
-        await this.chatHub.connect();
-        await this.chatHub.subscribeGroupMessages();
-        await this.chatHub.getGroupMessages();
-        this.chatHub.groupmessages$.subscribe((messages: GroupMessage[]) => {
-            this.groupMessages = messages;
-        });
-
+    openForm() {
+        this.isOpen = true;
     }
-
-    createGroup(name: string) { this.chatHub.createGroup(name); }
-    sendGroupMessage(message: string) { this.chatHub.sendGroupMessage(message); }
-    joinPersonToGroup() { this.chatHub.joinPersonToGroup(); }
+    async createGroup(name: string) {
+        await this.chatHub.createGroup(name);
+    }
+    async sendGroupMessage(message: string) {
+        await this.chatHub.sendGroupMessage(message);
+        this.inputValue = "";
+    }
+    async joinPersonToGroup(memberId: number) {
+        await this.chatHub.joinPersonToGroup(memberId);
+        this.isOpen = false;
+    }
 }

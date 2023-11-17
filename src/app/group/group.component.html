@@ -1,9 +1,35 @@
-<h1>SignalRChat</h1>
-<input (keyup)="onKey($event)">
-<button (click)="createGroup(inputValue)">Join group</button>
-<input (keyup)="onKey($event)">
-<button (click)="sendGroupMessage(inputValue)">Send message to group</button>
-<button (click)="joinPersonToGroup()">Join group</button>
-<div *ngFor="let message of groupMessages">
-    <p>{{ message.content}} {{ message.sentAt }}</p>
+<div class="chat-container">
+    <div class="group-header">
+        <button class="add-member-button" (click)="openForm()">
+            <i class="fa fa-user-plus"></i> Добавить участника
+        </button>
+    </div>
+    <div *ngIf="isOpen" class="overlay-container">
+        <div class="add-member-form">
+            <label for="memberName">Имя участника:</label>
+            <input type="text" id="memberName">
+            <button (click)="joinPersonToGroup(2)">Добавить</button>
+        </div>
+    </div>
+    <div class="history">
+        <div *ngFor="let gropedMessages of groupMessages">
+            <p class="date-message">{{gropedMessages.sentAt | date:'dd|MM|yyyy '}}</p>
+            <div *ngFor="let message of gropedMessages.messages">
+                <div *ngIf="message.senderId !== personId" class="incoming-message">
+                    <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
+                        date:'HH:mm'}}</p>
+                </div>
+                <div *ngIf="message.senderId === personId" class="outgoing-message">
+                    <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
+                        date:'HH:mm'}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="input-container">
+        <input #groupInput class="message-input" (keyup)="onKey($event)" [(ngModel)]="inputValue">
+        <button class="send-button" (click)="sendGroupMessage(groupInput.value)">
+            Отправить сообщение
+        </button>
+    </div>
 </div>

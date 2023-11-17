@@ -1,11 +1,38 @@
-<h1>SignalRChat</h1>
-<div *ngFor="let dialog of dialogs">
-    <button (click)="onKeyRecipientId(dialog.id)">{{ dialog.login}} {{ dialog.email }}</button>
-</div>
-<div *ngIf="show">
-    <input (keyup)="onKey($event)">
-    <button (click)="sendMessage(inputValue)">Send message</button>
-    <div *ngFor="let message of personalMessages">
-        <p>{{ message.content}} {{ message.senderId }}</p>
+<div class="chat-container">
+    <div class="dialogs-panel">
+        <div *ngFor="let dialog of dialogs">
+            <button *ngIf="dialog.isGroup === false" class="dialog-button" (click)="onKeyChat(dialog.id, dialog.name)">
+                {{ dialog.name }}
+            </button>
+            <button *ngIf="dialog.isGroup === true" class="dialog-button" (click)="onKeyGroup(dialog.id)">
+                {{ dialog.name }}
+            </button>
+        </div>
     </div>
+
+    <div class="chat-panel" *ngIf="showChat">
+        <div class="chat-header">
+            <p>{{nameDialog}}</p>
+        </div>
+        <div class="history">
+            <div *ngFor="let message of personalMessages">
+                <p class="date-message">{{message.sentAt | date:'dd|MM|yyyy '}}</p>
+                <div *ngFor="let message of message.messages">
+                    <div *ngIf="message.senderId !== personId" class="incoming-message">
+                        <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
+                            date:'HH:mm'}}</p>
+                    </div>
+                    <div *ngIf="message.senderId === personId" class="outgoing-message">
+                        <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
+                            date:'HH:mm'}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="input-container">
+            <input #box class="message-input" (keyup)="onKey(box.value)" [(ngModel)]="inputValue">
+            <button class="send-button" (click)="sendMessage(inputValue)">Send message</button>
+        </div>
+    </div>
+    <group *ngIf="showGroup" class="chat-panel"></group>
 </div>

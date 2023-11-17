@@ -6,8 +6,8 @@ import { GroupComponent } from './group/group.component';
 
 const routes: Routes = [
   { path: '', component: SignInComponent },
-  { path: 'chat', component: ChatComponent },
-  { path: 'group', component: GroupComponent },
+  { path: 'chat', component: ChatComponent, },
+
 ];
 
 @NgModule({

@@ -1,13 +1,19 @@
-<h2>Страница авторизации</h2>
+<div class="login-page">
 
-<div>
-    <label for="username">Логин:</label>
-    <input type="text" id="username" (keyup)="onKeyLogin($event)">
+    <div class="login-container">
+        <h2>Страница авторизации</h2>
+
+        <div>
+            <label for="username">Логин:</label>
+            <input type="text" id="username" (keyup)="onKeyLogin($event)">
+        </div>
+
+        <div>
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" (keyup)="onKeyPass($event)">
+        </div>
+
+        <button (click)="login()">Войти</button>
+    </div>
+
 </div>
-
-<div>
-    <label for="password">Пароль:</label>
-    <input type="password" id="password" (keyup)="onKeyPass($event)">
-</div>
-
-<button (click)="login()">Войти</button>

@@ -1,22 +1,28 @@
 export class GroupRequest {
     constructor(
         public Name: string,
-        public CreatorId: number
+        public PersonId: number
     ) { }
 }
 
 export class GroupMessageDto {
     constructor(
-        public GroupId: number,
-        public SenderId: number,
-        public Content: string,
+        public groupId: number,
+        public senderId: number,
+        public content: string,
     ) { }
 }
-
+export class GroupedMessagesInGroup {
+    constructor(
+        public sentAt: Date,
+        public messages: GroupMessage[]
+    ) { }
+}
 export class MemberRequest {
     constructor(
         public GroupId: number,
-        public AddedByPerson: number
+        public PersonId: number,
+        public AddedByPerson: number,
     ) { }
 }
 

@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 export class DataService {
     private tokenSubject = new BehaviorSubject<string>('');
     private personIdSubject = new BehaviorSubject<number>(0);
+    private groupIdSubject = new BehaviorSubject<number>(0);
     public recipientIdSubject = new BehaviorSubject<number>(0);
     setToken(token: string) {
         this.tokenSubject.next(token);
@@ -23,5 +24,11 @@ export class DataService {
     }
     getRecipientId() {
         return this.recipientIdSubject.getValue();
+    }
+    setGroupId(groupId: number) {
+        this.groupIdSubject.next(groupId);
+    }
+    getGroupId() {
+        return this.groupIdSubject.getValue();
     }
 }

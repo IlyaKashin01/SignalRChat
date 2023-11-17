@@ -4,7 +4,6 @@ import { AuthRequest } from './authDto';
 import { Router } from '@angular/router';
 import { DataService } from '../data.service';
 
-
 @Component({
     selector: 'signin',
     templateUrl: './signin.component.html',
@@ -15,7 +14,7 @@ export class SignInComponent {
     username: string = "";
     password: string = "";
     done: boolean = false;
-    constructor(private authService: AuthService, private router: Router, private tokenService: DataService) { }
+    constructor(private authService: AuthService, private router: Router, private tokenService: DataService,) { }
 
     onKeyLogin(event: any) {
         this.username = event.target.value;
@@ -23,12 +22,12 @@ export class SignInComponent {
     onKeyPass(event: any) {
         this.password = event.target.value;
     }
-    login() {
+    async login() {
         this.authService.signInRequest(new AuthRequest(this.username, this.password)).subscribe({
-            next: (data: any) => {
+            next: async (data: any) => {
                 this.done = true;
-                this.tokenService.setToken(data.result.token);
-                this.tokenService.setPersonId(data.result.person.id);
+                await this.tokenService.setToken(data.result.token);
+                await this.tokenService.setPersonId(data.result.person.id);
                 this.router.navigate(['/chat']);
             },
             error: error => console.log(error)

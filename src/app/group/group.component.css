@@ -127,3 +127,28 @@
     text-align: center;
     padding: 5px;
 }
+
+.messages {
+    float: left;
+    width: 70%;
+}
+
+.members-container {
+    flex: 1;
+    padding: 10px;
+    border-left: 1px solid #ccc;
+    float: right;
+    width: 25%;
+    background-color: #4caf50;
+    color: #fff;
+    margin: 1%;
+    border-radius: 25px;
+}
+
+.group-members {
+    margin-top: 10px;
+}
+
+.members-header {
+    font-weight: bold;
+}

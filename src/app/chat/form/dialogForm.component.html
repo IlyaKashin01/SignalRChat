@@ -1,0 +1,18 @@
+<div class="overlay" (click)="close()">
+    <div class="form-container" (click)="$event.stopPropagation()">
+        <div class="close-button" (click)="close()">X</div>
+        <ul>
+            <li *ngFor="let user of users" (click)="selectUser(user)" [class.selected]="user.id === selectedUserId">{{
+                user.login
+                }}</li>
+        </ul>
+        <button *ngIf="!isSelected" (click)="cancel()" class="form-button-close">Cancel</button>
+        <div *ngIf="isSelected" class="send-message">
+            <input [(ngModel)]="message" placeholder="Enter your message" class="message-input">
+            <div>
+                <button (click)="cancel()" class="form-button-close">Cancel</button>
+                <button (click)="send()" class="form-button-send">Send</button>
+            </div>
+        </div>
+    </div>
+</div>

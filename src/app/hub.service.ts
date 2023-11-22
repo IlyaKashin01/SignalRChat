@@ -12,7 +12,7 @@ export class HubService {
     private promiseStart: Promise<void> | undefined;
     Connection() {
         this.promiseStart = this.hubConnection.start()
-            .then(() => console.log('Подключение к хабу SignalR успешно установлено'))
+            .then(() => console.log('Подключение к хабу установлено'))
             .catch(err => console.error('Ошибка подключения к хабу SignalR:', err,));
         return this.hubConnection;
     }

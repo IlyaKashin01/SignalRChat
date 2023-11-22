@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="history">
-        <div *ngFor="let gropedMessages of groupMessages">
+        <div *ngFor="let gropedMessages of groupMessages" class="messages">
             <p class="date-message">{{gropedMessages.sentAt | date:'dd|MM|yyyy '}}</p>
             <div *ngFor="let message of gropedMessages.messages">
                 <div *ngIf="message.senderId !== personId" class="incoming-message">
@@ -25,7 +25,20 @@
                 </div>
             </div>
         </div>
+        <div class="members-container">
+            <div class="group-members">
+                <p class="members-header">Группу создал:</p>
+                <p class="members-header">{{members.creatorLogin}}</p>
+                <p class="members-header">Участники группы:</p>
+                <ul>
+                    <li *ngFor="let member of members.groupMembers">{{ member.memberLogin }} добавил
+                        {{member.addedByPersonLogin}}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
+
     <div class="input-container">
         <input #groupInput class="message-input" (keyup)="onKey($event)" [(ngModel)]="inputValue">
         <button class="send-button" (click)="sendGroupMessage(groupInput.value)">

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "../data.service";
 import { BehaviorSubject, } from "rxjs";
-import { GroupMessage, GroupMessageDto, GroupedMessagesInGroup, MemberRequest } from "./Dto";
+import { GroupMessage, GroupMessageDto, GroupedMessagesInGroup, MemberRequest, MemberResponse } from "./Dto";
 import { GroupRequest } from "./Dto";
 import { HubService } from "../hub.service";
 
@@ -17,6 +17,10 @@ export class GroupService {
     private message: GroupMessage = new GroupMessage(0, 0, "", new Date,);
     private messageSource = new BehaviorSubject<GroupMessage>(new GroupMessage(0, 0, "", new Date,));
     message$ = this.messageSource.asObservable();
+
+    private members: MemberResponse = new MemberResponse("", []);
+    private membersSource = new BehaviorSubject<MemberResponse>(new MemberResponse("", []));
+    members$ = this.membersSource.asObservable();
 
     token: string = "";
     personId: number = this.dataService.getPersonId();
@@ -72,11 +76,25 @@ export class GroupService {
         await this.hubConnection.invoke("GetAllGroupMessages", this.groupId)
             .catch(err => console.error(err));
     }
+
     async subscribeGroupMessages() {
         await this.hubConnection.on("AllGroupMessages", (messages: GroupedMessagesInGroup[]) => {
             this.groupMessages = messages;
             this.groupMessagesSource.next(this.groupMessages);
             console.log('Загружены сообщения группы:', messages);
         });
+    }
+
+    async getGroupMembers() {
+        await this.hubConnection.invoke("GetAllMembersInGroup", this.groupId)
+            .catch(err => console.log(err));
+    }
+
+    async subscribeGroupMembers() {
+        await this.hubConnection.on("AllMembers", (members: MemberResponse) => {
+            this.members = members;
+            this.membersSource.next(members);
+            console.log("Загружены участники группы: ", members);
+        })
     }
 }

@@ -34,3 +34,20 @@ export class GroupMessage {
         public sentAt: Date
     ) { }
 }
+
+export class MemberResponse {
+    constructor(
+        public creatorLogin: string,
+        public groupMembers: MemberInGroup[]
+    ) { }
+}
+
+export class MemberInGroup {
+    constructor(
+        public id: number,
+        public groupId: number,
+        public memberLogin: string,
+        public addedByPersonLogin: string,
+        public addedDate: Date
+    ) { }
+}

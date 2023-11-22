@@ -8,6 +8,8 @@
                 {{ dialog.name }}
             </button>
         </div>
+        <button (click)="openUserForm()" class="open-button">Новый диалог</button>
+        <app-user-form *ngIf="showUserForm" [users]="users" (closeForm)="closeUserForm()"></app-user-form>
     </div>
 
     <div class="chat-panel" *ngIf="showChat">

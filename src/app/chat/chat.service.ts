@@ -4,6 +4,7 @@ import { DataService } from "../data.service";
 import { BehaviorSubject, } from "rxjs";
 import { Dialog, GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "./Dto";
 import { HubService } from "../hub.service";
+import { PersonResponse } from "../signin/authDto";
 
 @Injectable()
 export class ChatService {
@@ -16,6 +17,10 @@ export class ChatService {
     private message: Message = new Message(0, 0, "", new Date, false);
     private messageSource = new BehaviorSubject<Message>(new Message(0, 0, "", new Date, false));
     message$ = this.messageSource.asObservable();
+
+    private users: PersonResponse[] = [];
+    private usersSource = new BehaviorSubject<PersonResponse[]>([]);
+    users$ = this.usersSource.asObservable();
 
     private personId: number = this.dataService.getPersonId();
     private hubConnection: HubConnection = this.hubService.Connection();
@@ -88,5 +93,18 @@ export class ChatService {
             'dialogs does not exist',
             'получен список диалогов'
         )
+    }
+
+    async subscribeUsers() {
+        await this.hubConnection.on('AllUsers', (users: PersonResponse[]) => {
+            this.users = users;
+            this.usersSource.next(this.users);
+            console.log('список пользователей', users);
+        })
+    }
+
+    async getUsers() {
+        await this.hubConnection.invoke('GetAllUsers', this.personId)
+            .catch(err => console.log(err));
     }
 }

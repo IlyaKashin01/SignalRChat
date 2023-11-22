@@ -3,6 +3,7 @@ import { ChatService } from './chat.service';
 import { Dialog, GroupedMessages, Message } from './Dto';
 import { DataService } from '../data.service';
 import { HubService } from '../hub.service';
+import { PersonResponse } from '../signin/authDto';
 
 @Component({
     selector: 'chat',
@@ -22,8 +23,11 @@ export class ChatComponent implements OnInit {
     dialogs: Dialog[] = [];
     nameDialog: string = "";
 
+    users: PersonResponse[] = [];
+
     showChat: boolean = false;
     showGroup: boolean = false;
+    showUserForm = false;
 
     constructor(private chatHub: ChatService, private dataService: DataService, private hubService: HubService) {
     }
@@ -53,13 +57,26 @@ export class ChatComponent implements OnInit {
         this.inputValue = '';
     }
 
+    openUserForm() {
+        this.showUserForm = true;
+    }
+
+    closeUserForm() {
+        this.showUserForm = false;
+    }
+
     async ngOnInit(): Promise<void> {
         if (await this.hubService.getPromiseSrart() !== null) {
             await this.chatHub.subscribeDialogs();
+            await this.chatHub.subscribeUsers();
             this.chatHub.dialogs$.subscribe((dialogs: Dialog[]) => {
                 this.dialogs = dialogs;
             });
+            this.chatHub.users$.subscribe((users: PersonResponse[]) => {
+                this.users = users;
+            });
             await this.chatHub.getDialogs();
+            await this.chatHub.getUsers();
             await this.chatHub.subscribeAllPersonalMessages();
             await this.chatHub.subscribeNewPersonalMessages();
             this.chatHub.personalmessages$.subscribe((messages: GroupedMessages[]) => {

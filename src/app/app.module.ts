@@ -10,6 +10,7 @@ import { DataService } from './data.service';
 import { ChatService } from './chat/chat.service';
 import { GroupModule } from './group/group.module';
 import { HubService } from './hub.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { HubService } from './hub.service';
     ChatModule,
     GroupModule,
     HttpClientModule,
+    BrowserAnimationsModule,
   ],
   providers: [DataService, ChatService, HubService],
   bootstrap: [AppComponent]

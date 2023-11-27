@@ -1,37 +1,46 @@
 <div class="chat-container">
-    <div class="dialogs-panel">
-        <div *ngFor="let dialog of dialogs">
-            <button *ngIf="dialog.isGroup === false" class="dialog-button" (click)="onKeyChat(dialog.id, dialog.name)">
-                {{ dialog.name }}
-            </button>
-            <button *ngIf="dialog.isGroup === true" class="dialog-button" (click)="onKeyGroup(dialog.id)">
-                {{ dialog.name }}
-            </button>
+    <div class="dialogs-container">
+        <div class="form-buttons">
+            <button (click)="openUserForm()" class="open-button">Новый диалог</button>
+            <app-user-form *ngIf="showUserForm" [users]="users" (closeForm)="closeUserForm()"></app-user-form>
+            <button (click)="openGroupForm()" class="open-button">Новая группа</button>
+            <group-form *ngIf="isGroupForm" (closeForm)="closeGroupForm()"></group-form>
         </div>
-        <button (click)="openUserForm()" class="open-button">Новый диалог</button>
-        <app-user-form *ngIf="showUserForm" [users]="users" (closeForm)="closeUserForm()"></app-user-form>
+        <div class="dialogs-panel">
+            <div *ngFor="let dialog of dialogs">
+                <button *ngIf="dialog.isGroup === false" class="dialog-button"
+                    (click)="onKeyChat(dialog.id, dialog.name)">
+                    {{ dialog.name }}
+                </button>
+                <button *ngIf="dialog.isGroup === true" class="dialog-button" (click)="onKeyGroup(dialog.id)">
+                    {{ dialog.name }}
+                </button>
+            </div>
+        </div>
     </div>
-
     <div class="chat-panel" *ngIf="showChat">
         <div class="chat-header">
             <p>{{nameDialog}}</p>
         </div>
         <div class="history">
-            <div *ngFor="let message of personalMessages">
-                <p class="date-message">{{message.sentAt | date:'dd|MM|yyyy '}}</p>
-                <div *ngFor="let message of message.messages">
+            <div *ngFor="let group of personalMessages">
+                <p class="date-message">{{group.sentAt | date:'dd|MM|yyyy '}}</p>
+                <div *ngFor="let message of group.messages">
+                    <!-- <p class="author">{{message.senderLogin}}</p> -->
                     <div *ngIf="message.senderId !== personId" class="incoming-message">
-                        <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
+                        <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
+                            |
                             date:'HH:mm'}}</p>
                     </div>
                     <div *ngIf="message.senderId === personId" class="outgoing-message">
-                        <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
+                        <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
+                            |
                             date:'HH:mm'}}</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="input-container">
+        <div class="input-container" *ngIf="showChat">
             <input #box class="message-input" (keyup)="onKey(box.value)" [(ngModel)]="inputValue">
             <button class="send-button" (click)="sendMessage(inputValue)">Send message</button>
         </div>

@@ -27,7 +27,8 @@ export class ChatComponent implements OnInit {
 
     showChat: boolean = false;
     showGroup: boolean = false;
-    showUserForm = false;
+    showUserForm: boolean = false;
+    isGroupForm: boolean = false;
 
     constructor(private chatHub: ChatService, private dataService: DataService, private hubService: HubService) {
     }
@@ -64,7 +65,13 @@ export class ChatComponent implements OnInit {
     closeUserForm() {
         this.showUserForm = false;
     }
+    openGroupForm() {
+        this.isGroupForm = true;
+    }
 
+    closeGroupForm() {
+        this.isGroupForm = false;
+    }
     async ngOnInit(): Promise<void> {
         if (await this.hubService.getPromiseSrart() !== null) {
             await this.chatHub.subscribeDialogs();

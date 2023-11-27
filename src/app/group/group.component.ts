@@ -51,8 +51,8 @@ export class GroupComponent implements OnInit {
         await this.chatHub.sendGroupMessage(message);
         this.inputValue = "";
     }
-    async joinPersonToGroup(memberId: number) {
-        await this.chatHub.joinPersonToGroup(memberId);
+    async joinPersonToGroup(groupId: number, memberId: number) {
+        await this.chatHub.joinPersonToGroup(groupId, memberId);
         this.isOpen = false;
     }
 }

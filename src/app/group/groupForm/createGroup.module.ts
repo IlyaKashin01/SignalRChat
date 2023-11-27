@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserFormComponent } from './dialogForm.component';
+import { GroupFormComponent } from './createGroup.component';
 
 @NgModule({
     declarations: [
-        UserFormComponent
+        GroupFormComponent
     ],
     imports: [
         CommonModule,
         FormsModule
     ],
     exports: [
-        UserFormComponent
+        GroupFormComponent
     ]
 })
-export class UserFormModule { }
+export class GroupFormModule { }

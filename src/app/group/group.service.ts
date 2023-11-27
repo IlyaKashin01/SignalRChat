@@ -5,6 +5,7 @@ import { BehaviorSubject, } from "rxjs";
 import { GroupMessage, GroupMessageDto, GroupedMessagesInGroup, MemberRequest, MemberResponse } from "./Dto";
 import { GroupRequest } from "./Dto";
 import { HubService } from "../hub.service";
+import { PersonResponse } from "../signin/authDto";
 
 @Injectable()
 export class GroupService {
@@ -22,9 +23,17 @@ export class GroupService {
     private membersSource = new BehaviorSubject<MemberResponse>(new MemberResponse("", []));
     members$ = this.membersSource.asObservable();
 
+    private users: PersonResponse[] = [];
+    private usersSource = new BehaviorSubject<PersonResponse[]>([]);
+    users$ = this.usersSource.asObservable();
+
     token: string = "";
     personId: number = this.dataService.getPersonId();
     groupId: number = this.dataService.getGroupId();
+    private newGroupId: number = 0;
+    private newGroupIdSource = new BehaviorSubject<number>(0);
+    newGroupId$ = this.newGroupIdSource.asObservable();
+
     private hubConnection: HubConnection = this.hubService.getConnection();
 
     error: string = "";
@@ -44,8 +53,16 @@ export class GroupService {
             .catch(error => console.error('Ошибка при создании группы:', error));
     }
 
-    async joinPersonToGroup(memberId: number) {
-        await this.hubConnection.invoke('AddPersonToGroup', new MemberRequest(this.groupId, memberId, this.personId))
+    async subscribeNewGroup() {
+        await this.hubConnection.on('NewGroup', (key: number) => {
+            this.newGroupId = key;
+            this.newGroupIdSource.next(this.newGroupId);
+            console.log('Id новой группы:', key);
+        });
+    }
+
+    async joinPersonToGroup(groupId: number, memberId: number) {
+        await this.hubConnection.invoke('AddPersonToGroup', new MemberRequest(groupId, memberId, this.personId))
             .then(() => console.log("Пользователь добавлен в группу"))
             .catch(error => console.error('Ошибка при добавлении к группе:', error));
     }
@@ -56,7 +73,7 @@ export class GroupService {
             .catch(error => console.error(`Ошибка при отправке сообщения от ${this.personId}:`, error));
     }
     async subscribeNewGroupMessages() {
-        this.hubConnection.on('NewGroupMessage', (message: GroupMessage) => {
+        await this.hubConnection.on('NewGroupMessage', (message: GroupMessage) => {
             this.message = message;
             this.messageSource.next(this.message);
             const currentDate = new Date();
@@ -68,7 +85,7 @@ export class GroupService {
                 this.groupMessages.push(new GroupedMessagesInGroup(message.sentAt, new Array<GroupMessage>(message)))
                 this.groupMessagesSource.next(this.groupMessages)
             }
-            console.log('новое сообщение:', message);
+            console.log('новое групповое сообщение:', message);
         });
     }
 
@@ -96,5 +113,19 @@ export class GroupService {
             this.membersSource.next(members);
             console.log("Загружены участники группы: ", members);
         })
+    }
+
+    async subscribeUsers() {
+        await this.hubConnection.on('AllUsersToAddGroup', (users: PersonResponse[]) => {
+            this.users = users;
+            this.usersSource.next(this.users);
+            console.log('список пользователей', users);
+        })
+    }
+
+    async getUsers() {
+        await this.hubConnection.invoke('GetAllUsersToAddGroup', this.newGroupId, this.personId)
+            .catch(err => console.log(err));
+        console.log(this.newGroupId)
     }
 }

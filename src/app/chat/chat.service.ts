@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "../data.service";
 import { BehaviorSubject, } from "rxjs";
-import { Dialog, GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "./Dto";
+import { Dialog, GetMessagesRequest, GroupedMessages, GroupedMessagesByLogin, Message, SendMessageRequest } from "./Dto";
 import { HubService } from "../hub.service";
 import { PersonResponse } from "../signin/authDto";
 
@@ -14,8 +14,8 @@ export class ChatService {
     private personalMessagesSource = new BehaviorSubject<GroupedMessages[]>([]);
     personalmessages$ = this.personalMessagesSource.asObservable();
 
-    private message: Message = new Message(0, 0, "", new Date, false);
-    private messageSource = new BehaviorSubject<Message>(new Message(0, 0, "", new Date, false));
+    private message: Message = new Message(0, "", 0, "", new Date, false);
+    private messageSource = new BehaviorSubject<Message>(new Message(0, "", 0, "", new Date, false));
     message$ = this.messageSource.asObservable();
 
     private users: PersonResponse[] = [];
@@ -55,7 +55,7 @@ export class ChatService {
             const currentDate = new Date();
             const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
             if (existingGroup) {
-                existingGroup.messages.push(message)
+                existingGroup.messages.push(message);
             }
             else {
                 this.personalMessages.push(new GroupedMessages(message.sentAt, new Array<Message>(message)))

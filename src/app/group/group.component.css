@@ -9,6 +9,15 @@
     background-color: #4caf50;
     color: #fff;
     text-align: right;
+    display: flex;
+}
+
+.chat-header {
+    padding: 5px;
+    background-color: #4caf50;
+    color: #fff;
+    text-align: center;
+    width: 90%;
 }
 
 .add-member-button {

@@ -1,5 +1,6 @@
 <div class="chat-container">
     <div class="dialogs-container">
+        <p>{{person.login}}<span *ngIf="onlineMarkers.includes(personId)" class="online-dot"></span></p>
         <div class="form-buttons">
             <button (click)="openUserForm()" class="open-button">Новый диалог</button>
             <app-user-form *ngIf="showUserForm" [users]="users" (closeForm)="closeUserForm()"></app-user-form>
@@ -10,10 +11,22 @@
             <div *ngFor="let dialog of dialogs">
                 <button *ngIf="dialog.isGroup === false" class="dialog-button"
                     (click)="onKeyChat(dialog.id, dialog.name)">
-                    {{ dialog.name }}
+                    <div>
+                        <p>{{ dialog.name }}<span *ngIf="onlineMarkers.includes(dialog.id)" class="online-dot"></span>
+                        </p>
+
+                        <p *ngIf="dialog.lastMessage">{{dialog.lastMessage}} - {{dialog.dateTime | date:'dd|MM|yyyy '}}
+                        </p>
+
+                    </div>
                 </button>
-                <button *ngIf="dialog.isGroup === true" class="dialog-button" (click)="onKeyGroup(dialog.id)">
-                    {{ dialog.name }}
+                <button *ngIf="dialog.isGroup === true" class="dialog-button"
+                    (click)="onKeyGroup(dialog.id , dialog.name)">
+                    <div>
+                        <p>{{ dialog.name }}</p>
+                        <p *ngIf="dialog.lastMessage">{{dialog.lastMessage}} - {{dialog.dateTime | date:'dd|MM|yyyy '}}
+                        </p>
+                    </div>
                 </button>
             </div>
         </div>
@@ -26,24 +39,30 @@
             <div *ngFor="let group of personalMessages">
                 <p class="date-message">{{group.sentAt | date:'dd|MM|yyyy '}}</p>
                 <div *ngFor="let message of group.messages">
-                    <!-- <p class="author">{{message.senderLogin}}</p> -->
-                    <div *ngIf="message.senderId !== personId" class="incoming-message">
-                        <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
-                            |
-                            date:'HH:mm'}}</p>
+                    <div *ngIf="message.senderId !== personId" class="incoming-message-container">
+                        <div class="incoming-message">
+                            <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
+                                |
+                                date:'HH:mm'}}</p>
+                        </div>
+                        <span *ngIf="message.isCheck === false" class="dot"></span>
                     </div>
-                    <div *ngIf="message.senderId === personId" class="outgoing-message">
-                        <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
-                            |
-                            date:'HH:mm'}}</p>
+                    <div *ngIf="message.senderId === personId" class="outgoing-message-container">
+                        <span *ngIf="message.isCheck === false" class="dot"></span>
+                        <div class="outgoing-message">
+                            <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
+                                |
+                                date:'HH:mm'}}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="input-container" *ngIf="showChat">
-            <input #box class="message-input" (keyup)="onKey(box.value)" [(ngModel)]="inputValue">
-            <button class="send-button" (click)="sendMessage(inputValue)">Send message</button>
+            <input class="message-input" [(ngModel)]="message" (keyup.enter)="sendMessage()"
+                (focus)="changeStatusMessages()">
+            <button class="send-button" (click)="sendMessage()">Send message</button>
         </div>
     </div>
-    <group *ngIf="showGroup" class="chat-panel"></group>
+    <group *ngIf="showGroup" class="chat-panel" [nameGroup]="nameGroup" [groupId]="groupId"></group>
 </div>

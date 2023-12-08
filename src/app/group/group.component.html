@@ -1,16 +1,14 @@
 <div class="chat-container">
     <div class="group-header">
+        <div class="chat-header">
+            <p>{{nameGroup}}</p>
+        </div>
         <button class="add-member-button" (click)="openForm()">
             <i class="fa fa-user-plus"></i> Добавить участника
         </button>
     </div>
-    <div *ngIf="isOpen" class="overlay-container">
-        <div class="add-member-form">
-            <label for="memberName">Имя участника:</label>
-            <input type="text" id="memberName">
-            <button (click)="joinPersonToGroup(2,2)">Добавить</button>
-        </div>
-    </div>
+    <member-form *ngIf="isOpen" (closeForm)="closeForm()" [groupId]="groupId"></member-form>
+
     <div class="history">
         <div *ngFor="let gropedMessages of groupMessages" class="messages">
             <p class="date-message">{{gropedMessages.sentAt | date:'dd|MM|yyyy '}}</p>
@@ -40,8 +38,8 @@
     </div>
 
     <div class="input-container">
-        <input #groupInput class="message-input" (keyup)="onKey($event)" [(ngModel)]="inputValue">
-        <button class="send-button" (click)="sendGroupMessage(groupInput.value)">
+        <input class="message-input" (keyup.enter)="sendGroupMessage()" [(ngModel)]="message">
+        <button class="send-button" (click)="sendGroupMessage()">
             Отправить сообщение
         </button>
     </div>

@@ -97,14 +97,28 @@
     margin: 0;
 }
 
+.incoming-message-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 100%;
+}
+
 .incoming-message {
     background-color: #e0e0e0;
     text-align: left;
     padding: 10px;
     margin-bottom: 5px;
     border-radius: 4px;
-    margin: 1%;
     width: 40%;
+    margin: auto 1%;
+}
+
+.outgoing-message-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    width: 100%;
 }
 
 .outgoing-message {
@@ -114,9 +128,8 @@
     padding: 10px;
     margin-bottom: 5px;
     border-radius: 4px;
-    margin: 1%;
     width: 40%;
-    margin-left: 58%;
+    margin: auto 1%;
 }
 
 .author {
@@ -126,4 +139,22 @@
 .date-message {
     text-align: center;
     padding: 5px;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    margin: auto 1%;
+}
+
+.online-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: green;
+    border-radius: 50%;
+    margin-left: 5px;
 }

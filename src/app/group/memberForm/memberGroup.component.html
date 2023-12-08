@@ -1,0 +1,17 @@
+<div class="overlay" (click)="close()">
+    <div class="form-container" (click)="$event.stopPropagation()">
+        <div class="close-button" (click)="close()">X</div>
+        <ul>
+            <li *ngFor="let user of users" (click)="selectUser(user)"
+                [class.selected]="selectedUserId.includes(user.id)">{{
+                user.login
+                }}</li>
+        </ul>
+        <div class="send-message">
+            <div>
+                <button (click)="cancel()" class="form-button-close">Закрыть</button>
+                <button (click)="joinToGroup()" class="form-button-send">Добавить</button>
+            </div>
+        </div>
+    </div>
+</div>

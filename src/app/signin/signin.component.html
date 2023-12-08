@@ -5,12 +5,12 @@
 
         <div>
             <label for="username">Логин:</label>
-            <input type="text" id="username" (keyup)="onKeyLogin($event)">
+            <input type="text" id="username" (keyup)="onKeyLogin($event)" required>
         </div>
 
         <div>
             <label for="password">Пароль:</label>
-            <input type="password" id="password" (keyup)="onKeyPass($event)">
+            <input type="password" id="password" (keyup)="onKeyPass($event)" (keyup.enter)="login()" required>
         </div>
 
         <button (click)="login()">Войти</button>

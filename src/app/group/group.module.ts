@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { GroupComponent } from './group.component';
 import { FormsModule } from '@angular/forms';
+import { MemberFormModule } from './memberForm/memberGroup.module';
 
 @NgModule({
-    imports: [CommonModule, BrowserModule, FormsModule],
+    imports: [CommonModule, BrowserModule, FormsModule, MemberFormModule],
     declarations: [
         GroupComponent
     ],

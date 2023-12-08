@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { PersonResponse } from './signin/authDto';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
     private tokenSubject = new BehaviorSubject<string>('');
-    private personIdSubject = new BehaviorSubject<number>(0);
+    private personSubject = new BehaviorSubject<PersonResponse>(new PersonResponse(0, "", ""));
     private groupIdSubject = new BehaviorSubject<number>(0);
     public recipientIdSubject = new BehaviorSubject<number>(0);
     setToken(token: string) {
@@ -13,11 +14,11 @@ export class DataService {
     getToken() {
         return this.tokenSubject.getValue();
     }
-    setPersonId(personId: number) {
-        this.personIdSubject.next(personId);
+    setPerson(person: PersonResponse) {
+        this.personSubject.next(person);
     }
-    getPersonId() {
-        return this.personIdSubject.getValue();
+    getPerson() {
+        return this.personSubject.getValue();
     }
     setRecipientId(recipientId: number) {
         this.recipientIdSubject.next(recipientId);

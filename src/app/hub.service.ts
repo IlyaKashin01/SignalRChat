@@ -1,26 +1,28 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
-import { DataService } from './data.service';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class HubService {
-    constructor(private dataService: DataService) { }
-    private hubConnection: HubConnection = new HubConnectionBuilder()
-        .withUrl(`https://localhost:7130/chat?access_token=${this.dataService.getToken()}`)
-        .build();
+    constructor() { }
+    private hubConnection: HubConnection | undefined;
     private promiseStart: Promise<void> | undefined;
-    Connection() {
+    private markers: number[] = [];
+    public OnlineMarkers = new BehaviorSubject<number[]>([]);
+    Connection(url: string, hubName: string, id: number) {
+        this.hubConnection = new HubConnectionBuilder()
+            .withUrl(url)
+            .build();
         this.promiseStart = this.hubConnection.start()
-            .then(() => console.log('Подключение к хабу установлено'))
-            .catch(err => console.error('Ошибка подключения к хабу SignalR:', err,));
+            .then(() => console.log(`Подключение к ${hubName} хабу установлено`))
+            .catch(err => console.error(`Ошибка подключения к ${hubName} хабу:`, err,));
+        if (this.markers.indexOf(id) === 0) {
+            this.markers.push(id);
+            this.OnlineMarkers.next(this.markers);
+        }
         return this.hubConnection;
     }
-    getPromiseSrart() { return this.promiseStart; }
     getConnection() { return this.hubConnection; }
-    async Invoke(nameMethod: string, params: any, nameError: string, nameLog: string) {
-        await this.hubConnection.invoke(nameMethod, params)
-            .then(() => console.log(nameLog))
-            .catch(error => console.error(nameError, error));
-    }
+    getPromiseSrart() { return this.promiseStart; }
+
 }

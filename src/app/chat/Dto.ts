@@ -1,6 +1,6 @@
 export class Message {
     constructor(
-        //public id: number,
+        public id: number,
         public senderId: number,
         public senderLogin: string,
         public recipientId: number,

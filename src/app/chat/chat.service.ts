@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "../data.service";
-import { BehaviorSubject, } from "rxjs";
+import { BehaviorSubject, elementAt, } from "rxjs";
 import { Dialog, GetMessagesRequest, GroupedMessages, GroupedMessagesByLogin, Message, SendMessageRequest } from "./Dto";
 import { HubService } from "../hub.service";
 import { PersonResponse } from "../signin/authDto";
@@ -14,20 +14,21 @@ export class ChatService {
     private personalMessagesSource = new BehaviorSubject<GroupedMessages[]>([]);
     personalmessages$ = this.personalMessagesSource.asObservable();
 
-    private message: Message = new Message(0, "", 0, "", new Date, false);
-    private messageSource = new BehaviorSubject<Message>(new Message(0, "", 0, "", new Date, false));
+    private messageSource = new BehaviorSubject<Message>(new Message(0, 0, "", 0, "", new Date, false));
     message$ = this.messageSource.asObservable();
 
-    private users: PersonResponse[] = [];
     private usersSource = new BehaviorSubject<PersonResponse[]>([]);
     users$ = this.usersSource.asObservable();
 
-    private personId: number = this.dataService.getPersonId();
-    private hubConnection: HubConnection = this.hubService.Connection();
+    private personId: number = this.dataService.getPerson().id;
+    private hubConnection: HubConnection = this.hubService.getConnection() || this.hubService.Connection(`https://localhost:7130/chat?access_token=${this.dataService.getToken()}`, 'chat', this.personId);
 
     dialogs: Dialog[] = [];
     private dialogsSourse = new BehaviorSubject<Dialog[]>([]);
     dialogs$ = this.dialogsSourse.asObservable();
+
+    private onlineMarkersSourse = new BehaviorSubject<number[]>([]);
+    onlineMarkers$ = this.onlineMarkersSourse.asObservable();
 
     error: string = "";
     private errorSource = new BehaviorSubject<string>("");
@@ -40,18 +41,26 @@ export class ChatService {
         })
     }
 
+    async getOnlineMarkers() {
+        await this.hubConnection.invoke('GetOnlineMarkers')
+            .then(() => console.log('получены отметки Online'))
+            .catch(error => console.log(error));
+    }
+
+    async subscribeOnlineMarkers() {
+        this.hubConnection.on('OnlineMarkers', (markers: number[]) => {
+            this.onlineMarkersSourse.next(markers);
+            console.log(markers)
+        })
+    }
     async sendMessage(message: string, recipientId: number) {
-        await this.hubService.Invoke(
-            'SendPersonalMessage',
-            new SendMessageRequest(this.personId, recipientId, message, false),
-            `Ошибка при отправке сообщения от ${this.personId}:`,
-            'сообщение отправлено'
-        );
+        await this.hubConnection.invoke('SendPersonalMessage', new SendMessageRequest(this.personId, recipientId, message, false))
+            .then(() => console.log('сообщение отправлено'))
+            .catch(error => console.error(`Ошибка при отправке сообщения от ${this.personId}:`, error));
     }
     async subscribeNewPersonalMessages() {
         this.hubConnection.on('NewMessage', (message: Message) => {
-            this.message = message;
-            this.messageSource.next(this.message);
+            this.messageSource.next(message);
             const currentDate = new Date();
             const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
             if (existingGroup) {
@@ -65,12 +74,9 @@ export class ChatService {
         });
     }
     async getAllPersonalMessages(recipientId: number) {
-        await this.hubService.Invoke(
-            "GetAllPersonalMessages",
-            new GetMessagesRequest(this.personId, recipientId),
-            `Ошибка при получении сообщений между ${this.personId} и ${recipientId}`,
-            `Загружен диалог между ${this.personId} и ${recipientId}`
-        )
+        await this.hubConnection.invoke("GetAllPersonalMessages", new GetMessagesRequest(this.personId, recipientId))
+            .then(() => console.log(`Загружен диалог между ${this.personId} и ${recipientId}`))
+            .catch(error => console.error(`Ошибка при получении сообщений между ${this.personId} и ${recipientId}`, error));
     }
     async subscribeAllPersonalMessages() {
         await this.hubConnection.on("AllPersonalMessageInDialog", (messages: GroupedMessages[]) => {
@@ -87,18 +93,20 @@ export class ChatService {
         });
     }
     async getDialogs() {
-        await this.hubService.Invoke(
-            'GetAllDialogs',
-            this.dataService.getPersonId(),
-            'dialogs does not exist',
-            'получен список диалогов'
-        )
+        await this.hubConnection.invoke('GetAllDialogs', this.dataService.getPerson().id)
+            .then(() => console.log('получен список диалогов'))
+            .catch(error => console.error('диалоги не найдены', error));
     }
-
+    async subscribeNewDialog() {
+        await this.hubConnection.on('AllDialogs', (dialog: Dialog) => {
+            this.dialogs.push(dialog)
+            this.dialogsSourse.next(this.dialogs)
+            console.log('новый диалог: ', dialog);
+        })
+    }
     async subscribeUsers() {
         await this.hubConnection.on('AllUsers', (users: PersonResponse[]) => {
-            this.users = users;
-            this.usersSource.next(this.users);
+            this.usersSource.next(users);
             console.log('список пользователей', users);
         })
     }
@@ -106,5 +114,30 @@ export class ChatService {
     async getUsers() {
         await this.hubConnection.invoke('GetAllUsers', this.personId)
             .catch(err => console.log(err));
+    }
+
+    async ChangeStatusIncomingMessages(recipientId: number) {
+        await this.hubConnection.invoke('ChangeStatusIncomingMessagesAsync', recipientId, this.personId)
+    }
+
+    async subscribeMessagesWithNewStatus() {
+        await this.hubConnection.on('MessagesWithNewStatus', (groupedMessages: GroupedMessages[]) => {
+            const currentDate = new Date();
+            groupedMessages.forEach(element => {
+                element.messages.forEach(message => {
+                    const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
+                    if (existingGroup) {
+                        existingGroup.messages.splice(message.id, 1);
+                        existingGroup.messages.push(message);
+                    }
+                    else {
+                        this.personalMessages.push(new GroupedMessages(message.sentAt, new Array<Message>(message)))
+                        this.personalMessagesSource.next(this.personalMessages)
+                    }
+                    console.log('новое сообщение:', message);
+                })
+            });
+
+        })
     }
 }

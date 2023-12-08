@@ -3,22 +3,23 @@ import { PersonResponse } from 'src/app/signin/authDto';
 import { GroupService } from '../group.service';
 import { ChatService } from 'src/app/chat/chat.service';
 import { HubService } from 'src/app/hub.service';
+import { DataService } from 'src/app/data.service';
 
 @Component({
-    selector: 'group-form',
-    templateUrl: './createGroup.component.html',
-    styleUrls: ['./createGroup.component.css'],
+    selector: 'member-form',
+    templateUrl: './memberGroup.component.html',
+    styleUrls: ['./memberGroup.component.css'],
     providers: [GroupService, ChatService]
 })
-export class GroupFormComponent implements OnInit {
+export class MemberFormComponent implements OnInit {
     users: PersonResponse[] = [];
     @Output() closeForm = new EventEmitter<void>();
     selectedUserId: number[] = [];
-    groupId: number = 0;
+    @Input() groupId: number = 0;
     message: string = "";
     name: string = "";
     isSelected: boolean = false;
-    constructor(private groupHub: GroupService, private chatHub: ChatService, private hubService: HubService) {
+    constructor(private groupHub: GroupService, private hubService: HubService, private dataService: DataService) {
     }
     async ngOnInit(): Promise<void> {
         if (await this.hubService.getPromiseSrart() !== null) {
@@ -26,10 +27,7 @@ export class GroupFormComponent implements OnInit {
             this.groupHub.users$.subscribe((users: PersonResponse[]) => {
                 this.users = users;
             });
-            await this.groupHub.subscribeNewGroup();
-            this.groupHub.newGroupId$.subscribe((key: number) => {
-                this.groupId = key;
-            });
+
             await this.groupHub.getUsers(this.groupId);
         }
     }
@@ -47,15 +45,11 @@ export class GroupFormComponent implements OnInit {
         this.close();
     }
 
-    async create() {
-        await this.groupHub.createGroup(this.name);
-        this.chatHub.getDialogs();
-        this.groupHub.getUsers(this.groupId);
-    }
     async joinToGroup() {
         await this.selectedUserId.forEach(async id => {
             await this.groupHub.joinPersonToGroup(this.groupId, id);
         });
+        await this.groupHub.getGroupMembers(this.groupId);
         this.close();
     }
 }

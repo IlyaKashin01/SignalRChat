@@ -6,11 +6,12 @@ import { AppComponent } from './app.component';
 import { SignInModule } from './signin/signin.module';
 import { ChatModule } from './chat/chat.module';
 import { HttpClientModule } from '@angular/common/http';
-import { DataService } from './data.service';
-import { ChatService } from './chat/chat.service';
+import { DataService } from './common/data.service';
+import { ChatService } from './common/chat.service';
 import { GroupModule } from './group/group.module';
-import { HubService } from './hub.service';
+import { HubService } from './common/hub.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NotificationModule } from './notification/notification.module';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     GroupModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    NotificationModule
   ],
   providers: [DataService, ChatService, HubService],
   bootstrap: [AppComponent]

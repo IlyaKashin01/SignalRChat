@@ -5,7 +5,7 @@ export class GroupRequest {
     ) { }
 }
 
-export class GroupMessageDto {
+export class GroupMessageRequest {
     constructor(
         public groupId: number,
         public senderId: number,
@@ -30,8 +30,10 @@ export class GroupMessage {
     constructor(
         public groupId: number,
         public senderId: number,
+        public senderLogin: string,
         public content: string,
-        public sentAt: Date
+        public sentAt: Date,
+        public isCheck: boolean
     ) { }
 }
 
@@ -46,6 +48,7 @@ export class MemberInGroup {
     constructor(
         public id: number,
         public groupId: number,
+        public personId: number,
         public memberLogin: string,
         public addedByPersonLogin: string,
         public addedDate: Date

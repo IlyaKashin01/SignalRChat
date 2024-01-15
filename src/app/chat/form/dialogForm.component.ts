@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PersonResponse } from 'src/app/signin/authDto';
-import { ChatService } from '../chat.service';
+import { ChatService } from '../../common/chat.service';
 
 @Component({
     selector: 'app-user-form',
@@ -30,7 +30,7 @@ export class UserFormComponent {
     }
 
     send() {
-        this.chatHub.sendMessage(this.message, this.selectedUserId);
+        this.chatHub.sendMessage(this.message, this.selectedUserId, true);
         this.chatHub.getDialogs();
         console.log('Sending message:', this.message);
         this.close();

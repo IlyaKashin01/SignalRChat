@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AuthRequest, AuthResponse, OperationResult, SignUpRequest } from './authDto';
+import { AuthRequest, AuthResponse, OperationResult, SignUpRequest } from '../signin/authDto';
 import { Observable } from 'rxjs';
 
 @Injectable()

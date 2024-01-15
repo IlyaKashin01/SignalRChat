@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { AuthService } from './http.service';
+import { AuthService } from '../common/http.service';
 import { AuthRequest, AuthResponse, OperationResult } from './authDto';
 import { NavigationExtras, Router } from '@angular/router';
-import { DataService } from '../data.service';
-import { HubService } from '../hub.service';
+import { DataService } from '../common/data.service';
+import { HubService } from '../common/hub.service';
+import { GroupService } from '../common/group.service';
 
 @Component({
     selector: 'signin',
@@ -14,7 +15,6 @@ import { HubService } from '../hub.service';
 export class SignInComponent {
     username: string = "";
     password: string = "";
-    done: boolean = false;
     constructor(private authService: AuthService, private router: Router, private tokenService: DataService, private hubService: HubService) { }
 
     onKeyLogin(event: any) {
@@ -27,11 +27,12 @@ export class SignInComponent {
         this.authService.signInRequest(new AuthRequest(this.username, this.password)).subscribe({
             next: async (data: OperationResult<AuthResponse>) => {
                 if (data.result) {
-                    this.done = true;
                     await this.tokenService.setToken(data.result.token);
                     await this.tokenService.setPerson(data.result.person);
-                    if (await this.hubService.Connection(`https://localhost:7130/chat?access_token=${data.result.token}`, 'chat', data.result.person.id))
+                    if (await this.hubService.ConnectionChatHub(data.result.token, data.result.person.id)
+                        && await this.hubService.ConnectionGroupHub(data.result.token, data.result.person.id)) {
                         this.router.navigate(['/chat']);
+                    }
                 }
                 else
                     console.log(data.message, data.errorCode, data.stackTrace);

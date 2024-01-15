@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PersonResponse } from 'src/app/signin/authDto';
-import { GroupService } from '../group.service';
-import { ChatService } from 'src/app/chat/chat.service';
-import { HubService } from 'src/app/hub.service';
-import { DataService } from 'src/app/data.service';
+import { GroupService } from '../../common/group.service';
+import { ChatService } from 'src/app/common/chat.service';
+import { HubService } from 'src/app/common/hub.service';
 
 @Component({
     selector: 'member-form',
@@ -19,16 +18,20 @@ export class MemberFormComponent implements OnInit {
     message: string = "";
     name: string = "";
     isSelected: boolean = false;
-    constructor(private groupHub: GroupService, private hubService: HubService, private dataService: DataService) {
+    subscribed: boolean = false;
+    constructor(private groupHub: GroupService, private hubService: HubService) {
     }
     async ngOnInit(): Promise<void> {
-        if (await this.hubService.getPromiseSrart() !== null) {
-            await this.groupHub.subscribeUsers();
-            this.groupHub.users$.subscribe((users: PersonResponse[]) => {
-                this.users = users;
-            });
+        if (await this.hubService.getGroupPromiseStart() !== null) {
+            if (!this.subscribed) {
+                await this.groupHub.subscribeUsers();
+                this.groupHub.users$.subscribe((users: PersonResponse[]) => {
+                    this.users = users;
+                });
 
-            await this.groupHub.getUsers(this.groupId);
+                await this.groupHub.getUsers(this.groupId);
+                this.subscribed = true;
+            }
         }
     }
     close() {

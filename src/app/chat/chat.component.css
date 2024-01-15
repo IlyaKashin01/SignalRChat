@@ -106,12 +106,9 @@
 
 .incoming-message {
     background-color: #e0e0e0;
-    text-align: left;
-    padding: 10px;
-    margin-bottom: 5px;
     border-radius: 4px;
-    width: 40%;
-    margin: auto 1%;
+    padding: 10px;
+    flex: 1;
 }
 
 .outgoing-message-container {
@@ -124,12 +121,35 @@
 .outgoing-message {
     background-color: #4caf50;
     color: #fff;
-    text-align: right;
-    padding: 10px;
-    margin-bottom: 5px;
     border-radius: 4px;
+    padding: 10px;
+    flex: 1;
+}
+
+.incoming-item {
+    text-align: left;
     width: 40%;
-    margin: auto 1%;
+    margin: 1%;
+}
+
+.incoming-sender {
+    margin: 0;
+}
+
+.outgoing-item {
+    text-align: right;
+    width: 40%;
+    margin: 1%;
+}
+
+.outgoing-sender {
+    margin: 0;
+}
+
+.message-with-marker {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
 }
 
 .author {

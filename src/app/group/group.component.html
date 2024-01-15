@@ -1,45 +1,60 @@
 <div class="chat-container">
     <div class="group-header">
         <div class="chat-header">
-            <p>{{nameGroup}}</p>
+            <p>{{nameGroup}}, <ng-icon name="heroUsers"></ng-icon> {{countMembers}}</p>
         </div>
         <button class="add-member-button" (click)="openForm()">
             <i class="fa fa-user-plus"></i> Добавить участника
         </button>
+        <button class="add-member-button" (click)="leaveGroup()">
+            <i class="fa fa-user-plus"></i> Покинуть группу
+        </button>
+        <button class="add-member-button" (click)="openWindow()">
+            <i class="fa fa-user-plus"></i> Информация
+        </button>
     </div>
     <member-form *ngIf="isOpen" (closeForm)="closeForm()" [groupId]="groupId"></member-form>
-
+    <group-window *ngIf="isOpenWindow" (closeForm)="closeWindow()" [members]="members" [onlineMarkers]="onlineMarkers" [personId]="personId"></group-window>
+    <app-notification *ngIf="showNotification" (close)="close()" [title]="groupName" [message]="notification" [isShow]="showNotification"></app-notification>
     <div class="history">
         <div *ngFor="let gropedMessages of groupMessages" class="messages">
             <p class="date-message">{{gropedMessages.sentAt | date:'dd|MM|yyyy '}}</p>
             <div *ngFor="let message of gropedMessages.messages">
-                <div *ngIf="message.senderId !== personId" class="incoming-message">
-                    <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
-                        date:'HH:mm'}}</p>
+                <div *ngIf="message.senderId !== personId && message.senderId !== 0" class="incoming-message-container">
+                    <div class="incoming-item">
+                        <p class="incoming-sender">{{ message.senderLogin}} - {{ message.sentAt | date:'HH:mm'}}</p>
+                        <div class="message-with-marker">
+                            <div class="incoming-message">
+                                <p class="message-text">{{ message.content }}</p>
+                            </div>
+                            <span *ngIf="message.isCheck === false" class="dot"></span>
+                        </div>
+                    </div>
                 </div>
-                <div *ngIf="message.senderId === personId" class="outgoing-message">
-                    <p class="message-text">{{ message.content }} - {{ message.senderId}} - {{ message.sentAt |
-                        date:'HH:mm'}}</p>
+                <div *ngIf="message.senderId === 0" class="date-message">
+                    <p>{{ message.content}}</p>
                 </div>
-            </div>
-        </div>
-        <div class="members-container">
-            <div class="group-members">
-                <p class="members-header">Группу создал:</p>
-                <p class="members-header">{{members.creatorLogin}}</p>
-                <p class="members-header">Участники группы:</p>
-                <ul>
-                    <li *ngFor="let member of members.groupMembers">{{ member.memberLogin }} добавил
-                        {{member.addedByPersonLogin}}
-                    </li>
-                </ul>
+                <div *ngIf="addedNotifications.length > 0 " class="date-message">
+                    <p>{{ addedNotifications[addedNotifications.length - 1] }}</p>
+                </div>
+                <div *ngIf="message.senderId === personId" class="outgoing-message-container">
+                        <div class="outgoing-item">
+                            <p class="outgoing-sender">{{ message.senderLogin}} - {{ message.sentAt | date:'HH:mm'}}</p>
+                            <div class="message-with-marker">
+                                <span *ngIf="message.isCheck === false" class="dot"></span>
+                                <div class="outgoing-message">
+                                    <p class="message-text">{{ message.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </div>
 
     <div class="input-container">
-        <input class="message-input" (keyup.enter)="sendGroupMessage()" [(ngModel)]="message">
-        <button class="send-button" (click)="sendGroupMessage()">
+        <input class="message-input" (keyup.enter)="sendGroupMessage()" [(ngModel)]="message" (focus)="changeStatusMessages()" [disabled]="personStatus">
+        <button class="send-button" (click)="sendGroupMessage()" [disabled]="personStatus">
             Отправить сообщение
         </button>
     </div>

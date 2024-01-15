@@ -1,0 +1,5 @@
+<div class="notification" *ngIf="isShow">
+    <div class="close-button" (click)="onClose()">X</div>
+    <div class="header">{{ title }}</div>
+    <div class="content">{{ message }}</div>
+</div>

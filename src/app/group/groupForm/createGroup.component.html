@@ -2,22 +2,24 @@
     <div class="form-container" (click)="$event.stopPropagation()">
         <div class="close-button" (click)="close()">X</div>
         <input [(ngModel)]="name" placeholder="Название группы" class="message-input">
-        <ul>
-            <li *ngFor="let user of users" (click)="selectUser(user)"
-                [class.selected]="selectedUserId.includes(user.id)">{{
-                user.login
-                }}</li>
-        </ul>
-        <div *ngIf="!isSelected" class="send-message">
+        <div *ngIf="!isCreated" class="send-message">
             <div>
                 <button (click)="cancel()" class="form-button-close">Cancel</button>
                 <button (click)="create()" class="form-button-send">Send</button>
             </div>
         </div>
-        <div *ngIf="isSelected" class="send-message">
-            <div>
-                <button (click)="cancel()" class="form-button-close">Cancel</button>
-                <button (click)="joinToGroup()" class="form-button-send">Send</button>
+        <div *ngIf="isCreated">
+            <ul>
+                <li *ngFor="let user of users" (click)="selectUser(user)"
+                    [class.selected]="selectedUserId.includes(user.id)">{{
+                    user.login
+                    }}</li>
+            </ul>
+            <div class="send-message">
+                <div>
+                    <button (click)="cancel()" class="form-button-close">Cancel</button>
+                    <button (click)="joinToGroup()" class="form-button-send">Send</button>
+                </div>
             </div>
         </div>
     </div>

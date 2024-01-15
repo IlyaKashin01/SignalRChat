@@ -7,6 +7,8 @@
             <button (click)="openGroupForm()" class="open-button">Новая группа</button>
             <group-form *ngIf="isGroupForm" (closeForm)="closeGroupForm()"></group-form>
         </div>
+        <app-notification *ngIf="notification !== ''" [title]="nameDialogNotification"
+            [message]="notification" [isShow]="true"></app-notification>
         <div class="dialogs-panel">
             <div *ngFor="let dialog of dialogs">
                 <button *ngIf="dialog.isGroup === false" class="dialog-button"
@@ -40,19 +42,25 @@
                 <p class="date-message">{{group.sentAt | date:'dd|MM|yyyy '}}</p>
                 <div *ngFor="let message of group.messages">
                     <div *ngIf="message.senderId !== personId" class="incoming-message-container">
-                        <div class="incoming-message">
-                            <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
-                                |
-                                date:'HH:mm'}}</p>
+                        <div class="incoming-item">
+                            <p class="incoming-sender">{{ message.senderLogin}} - {{ message.sentAt | date:'HH:mm'}}</p>
+                            <div class="message-with-marker">
+                                <div class="incoming-message">
+                                    <p class="message-text">{{ message.content }}</p>
+                                </div>
+                                <span *ngIf="message.isCheck === false" class="dot"></span>
+                            </div>
                         </div>
-                        <span *ngIf="message.isCheck === false" class="dot"></span>
                     </div>
                     <div *ngIf="message.senderId === personId" class="outgoing-message-container">
-                        <span *ngIf="message.isCheck === false" class="dot"></span>
-                        <div class="outgoing-message">
-                            <p class="message-text">{{ message.content }} - {{ message.senderLogin}} - {{ message.sentAt
-                                |
-                                date:'HH:mm'}}</p>
+                        <div class="outgoing-item">
+                            <p class="outgoing-sender">{{ message.senderLogin}} - {{ message.sentAt | date:'HH:mm'}}</p>
+                            <div class="message-with-marker">
+                                <span *ngIf="message.isCheck === false" class="dot"></span>
+                                <div class="outgoing-message">
+                                    <p class="message-text">{{ message.content }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -64,5 +72,5 @@
             <button class="send-button" (click)="sendMessage()">Send message</button>
         </div>
     </div>
-    <group *ngIf="showGroup" class="chat-panel" [nameGroup]="nameGroup" [groupId]="groupId"></group>
+    <group *ngIf="showGroup" class="chat-panel" [nameGroup]="nameGroup" [groupId]="groupId" [personLogin]="person.login" [onlineMarkers]="onlineMarkers"></group>
 </div>

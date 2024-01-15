@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PersonResponse } from 'src/app/signin/authDto';
-import { GroupService } from '../group.service';
-import { ChatService } from 'src/app/chat/chat.service';
-import { HubService } from 'src/app/hub.service';
+import { GroupService } from '../../common/group.service';
+import { ChatService } from 'src/app/common/chat.service';
+import { HubService } from 'src/app/common/hub.service';
 
 @Component({
     selector: 'group-form',
@@ -18,10 +18,11 @@ export class GroupFormComponent implements OnInit {
     message: string = "";
     name: string = "";
     isSelected: boolean = false;
+    isCreated: boolean = false;
     constructor(private groupHub: GroupService, private chatHub: ChatService, private hubService: HubService) {
     }
     async ngOnInit(): Promise<void> {
-        if (await this.hubService.getPromiseSrart() !== null) {
+        if (await this.hubService.getGroupPromiseStart() !== null) {
             await this.groupHub.subscribeUsers();
             this.groupHub.users$.subscribe((users: PersonResponse[]) => {
                 this.users = users;
@@ -51,6 +52,7 @@ export class GroupFormComponent implements OnInit {
         await this.groupHub.createGroup(this.name);
         this.chatHub.getDialogs();
         this.groupHub.getUsers(this.groupId);
+        this.isCreated = true;
     }
     async joinToGroup() {
         await this.selectedUserId.forEach(async id => {

@@ -1,10 +1,11 @@
 import { Component, Input, OnInit, } from '@angular/core';
-import { ChatService } from './chat.service';
+import { ChatService } from '../common/chat.service';
 import { Dialog, GroupedMessages, Message } from './Dto';
-import { DataService } from '../data.service';
-import { HubService } from '../hub.service';
+import { DataService } from '../common/data.service';
+import { HubService } from '../common/hub.service';
 import { PersonResponse } from '../signin/authDto';
 import { HubConnection } from '@aspnet/signalr';
+import { GroupService } from '../common/group.service';
 
 @Component({
     selector: 'chat',
@@ -31,6 +32,9 @@ export class ChatComponent implements OnInit {
 
     users: PersonResponse[] = [];
 
+    nameDialogNotification: string = '';
+    notification: string = '';
+
     showChat: boolean = false;
     showGroup: boolean = false;
     showUserForm: boolean = false;
@@ -40,9 +44,9 @@ export class ChatComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        await this.hubService.Connection(`https://localhost:7130/group?access_token=${this.dataService.getToken()}`, 'group', this.personId);
-        if (await this.hubService.getPromiseSrart() !== null) {
+        if (await this.hubService.getChatPromiseStart() !== null) {
             await this.chatHub.subscribeOnlineMarkers();
+            await this.chatHub.subscribeNotification();
             await this.chatHub.subscribeDialogs();
             await this.chatHub.subscribeNewDialog();
             await this.chatHub.subscribeUsers();
@@ -67,6 +71,12 @@ export class ChatComponent implements OnInit {
             this.chatHub.onlineMarkers$.subscribe((markers: number[]) => {
                 this.onlineMarkers = markers;
             });
+            this.chatHub.nameDialog$.subscribe((name: string) => {
+                this.nameDialogNotification = name;
+            });
+            this.chatHub.notification$.subscribe((content: string) => {
+                this.notification = content;
+            });
         }
     }
 
@@ -74,7 +84,7 @@ export class ChatComponent implements OnInit {
         if (this.showGroup === true)
             this.showGroup = false;
         this.showChat = true;
-        if (this.recipientId !== 0) await this.chatHub.ChangeStatusIncomingMessages(id);
+        //if (this.recipientId !== 0) await this.chatHub.ChangeStatusIncomingMessages(id);
         this.recipientId = id;
         this.nameDialog = name;
         await this.chatHub.getAllPersonalMessages(id);
@@ -89,11 +99,11 @@ export class ChatComponent implements OnInit {
     }
 
     async sendMessage() {
-        await this.chatHub.sendMessage(this.message, this.recipientId);
+        await this.chatHub.sendMessage(this.message, this.recipientId, false);
         this.message = '';
     }
     async changeStatusMessages() {
-        //await this.chatHub.ChangeStatusIncomingMessages(this.recipientId);
+        await this.chatHub.ChangeStatusIncomingMessages(this.recipientId);
     }
     openUserForm() {
         this.showUserForm = true;

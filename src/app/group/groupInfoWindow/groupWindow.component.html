@@ -1,0 +1,24 @@
+<div class="overlay" (click)="close()">
+    <div class="form-container" (click)="$event.stopPropagation()">
+        <div class="close-button" (click)="close()">X</div>
+        <div class="members-container">
+            <div class="group-members">
+                <p class="members-header">Группу создал:</p>
+                <p class="members-header"><span *ngIf="onlineMarkers.includes(personId) || members.creatorLogin === personName" class="online-dot"></span> {{members.creatorLogin}}</p>
+                <p class="members-header">Участники группы:</p>
+                <td>
+                    <tr *ngFor="let member of members.groupMembers" class="member">
+                        <p><span *ngIf="onlineMarkers.includes(member.personId)" class="online-dot"></span> {{ member.memberLogin }} добавил
+                        {{member.addedByPersonLogin}} </p>
+                        <button *ngIf="member.id !== personId"><mat-icon class="delete-person-button" aria-hidden="false" aria-label="Example home icon">close</mat-icon></button>
+                    </tr>
+                </td>
+            </div>
+        </div>
+        <div class="send-message">
+            <div>
+                <button (click)="close()" class="form-button-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

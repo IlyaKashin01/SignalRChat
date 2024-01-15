@@ -7,13 +7,14 @@ import { AppRoutingModule } from '../app-routing.module';
 import { GroupModule } from '../group/group.module';
 import { UserFormModule } from './form/dialogForm.module';
 import { GroupFormModule } from '../group/groupForm/createGroup.module';
+import { NotificationModule } from "../notification/notification.module";
 
 @NgModule({
-    imports: [CommonModule, BrowserModule, FormsModule, AppRoutingModule, GroupModule, UserFormModule, GroupFormModule],
     declarations: [
         ChatComponent
     ],
     providers: [],
-    bootstrap: [ChatComponent]
+    bootstrap: [ChatComponent],
+    imports: [CommonModule, BrowserModule, FormsModule, AppRoutingModule, GroupModule, UserFormModule, GroupFormModule, NotificationModule]
 })
 export class ChatModule { }

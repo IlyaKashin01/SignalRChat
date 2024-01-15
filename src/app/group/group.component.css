@@ -110,26 +110,30 @@
     margin: 0;
 }
 
-.incoming-message {
-    background-color: #e0e0e0;
+.incoming-item {
     text-align: left;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
     width: 40%;
     margin: 1%;
 }
 
-.outgoing-message {
-    background-color: #4caf50;
-    color: #fff;
+.incoming-sender {
+    margin: 0;
+}
+
+.outgoing-item {
     text-align: right;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
     width: 40%;
     margin: 1%;
-    margin-left: 58%;
+}
+
+.outgoing-sender {
+    margin: 0;
+}
+
+.message-with-marker {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
 }
 
 .date-message {
@@ -139,7 +143,7 @@
 
 .messages {
     float: left;
-    width: 70%;
+    width: 100%;
 }
 
 .members-container {
@@ -160,4 +164,42 @@
 
 .members-header {
     font-weight: bold;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    margin: auto 1%;
+}
+
+.incoming-message-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    width: 100%;
+}
+
+.incoming-message {
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    padding: 10px;
+    flex: 1;
+}
+
+.outgoing-message-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    width: 100%;
+}
+
+.outgoing-message {
+    background-color: #4caf50;
+    color: #fff;
+    border-radius: 4px;
+    padding: 10px;
+    flex: 1;
 }

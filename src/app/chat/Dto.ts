@@ -26,7 +26,7 @@ export class SendMessageRequest {
         public senderId: number,
         public recipientId: number,
         public content: string,
-        public isCheck: boolean
+        public isNewDialog: boolean
     ) { }
 }
 

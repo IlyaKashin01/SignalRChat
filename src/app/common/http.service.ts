@@ -12,7 +12,7 @@ export class AuthService {
         return this.http.post<OperationResult<AuthResponse>>('https://localhost:7130/api/auth/signin', requestBody);
     }
 
-    signUpRequest(requestBody: SignUpRequest): Observable<OperationResult<AuthResponse>> {
-        return this.http.post<OperationResult<AuthResponse>>('https://localhost:7130/api/auth/signup', requestBody);
+    signUpRequest(requestBody: SignUpRequest): Observable<OperationResult<number>> {
+        return this.http.post<OperationResult<number>>('https://localhost:7130/api/auth/signup', requestBody);
     }
 }

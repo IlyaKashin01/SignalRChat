@@ -12,6 +12,7 @@ import { GroupModule } from './group/group.module';
 import { HubService } from './common/hub.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NotificationModule } from './notification/notification.module';
+import { SignUpModule } from './signup/signup.module';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { NotificationModule } from './notification/notification.module';
     BrowserModule,
     AppRoutingModule,
     SignInModule,
+    SignUpModule,
     ChatModule,
     GroupModule,
     HttpClientModule,

@@ -1,0 +1,55 @@
+<div class="signup-page">
+    <div class="signup-container">
+      <h2>Регистрация</h2>
+  
+      <form [formGroup]="registrationForm">
+        <div>
+          <label for="username">Логин:</label>
+          <div class="errorAllert" *ngIf="registrationForm.get('username')!.hasError('pattern') && registrationForm.get('username')!.touched">
+            Имя пользователя должно содержать только латинские буквы.
+          </div>
+          <div class="errorAllert" *ngIf="registrationForm.get('username')!.hasError('required') && registrationForm.get('username')!.touched">
+            Поле обязательно для заполнения.
+          </div>
+          <input type="text" formControlName="username">
+        </div>
+  
+        <div>
+          <label for="password">Пароль:</label>
+          <div class="errorAllert" *ngIf="registrationForm.get('password')!.hasError('pattern') && registrationForm.get('password')!.touched">
+            Пароль должен содержать не менее 6 символов, включая латинские буквы и знаки.
+          </div>
+          <div class="errorAllert" *ngIf="registrationForm.get('password')!.hasError('required') && registrationForm.get('password')!.touched">
+            Поле обязательно для заполнения.
+          </div>
+          <input type="password" formControlName="password">
+        </div>
+  
+        <div>
+          <label for="confirmPassword">Подтверждение пароля:</label>
+          <div class="errorAllert" *ngIf="registrationForm.hasError('mismatch') && registrationForm.get('confirmPassword')!.touched">
+            Пароли не совпадают.
+          </div>
+          <div class="errorAllert" *ngIf="registrationForm.get('confirmPassword')!.hasError('required') && registrationForm.get('confirmPassword')!.touched">
+            Поле обязательно для заполнения.
+          </div>
+          <input type="password" formControlName="confirmPassword">
+        </div>
+  
+        <div>
+          <label for="email">Email:</label>
+          <div class="errorAllert" *ngIf="registrationForm.get('email')!.hasError('email') && registrationForm.get('email')!.touched">
+            Пожалуйста, введите корректный адрес электронной почты.
+          </div>
+          <div class="errorAllert" *ngIf="registrationForm.get('email')!.hasError('required') && registrationForm.get('email')!.touched">
+            Поле обязательно для заполнения.
+          </div>
+          <input type="email" (keyup.enter)="signup(registrationForm)" formControlName="email">
+        </div>
+  
+        <button type="button" (click)="signup(registrationForm)">Зарегистрироваться</button>
+        <button type="button" (click)="goToSignIn()" class="back-button">Назад</button>
+      </form>
+    </div>
+  </div>
+  

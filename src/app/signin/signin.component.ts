@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../common/http.service';
 import { AuthRequest, AuthResponse, OperationResult } from './authDto';
-import { NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { DataService } from '../common/data.service';
 import { HubService } from '../common/hub.service';
-import { GroupService } from '../common/group.service';
 
 @Component({
     selector: 'signin',
@@ -23,10 +22,13 @@ export class SignInComponent {
     onKeyPass(event: any) {
         this.password = event.target.value;
     }
+    goToSignUp(){
+        this.router.navigate(['/signup']);
+    }
     async login() {
         this.authService.signInRequest(new AuthRequest(this.username, this.password)).subscribe({
             next: async (data: OperationResult<AuthResponse>) => {
-                if (data.result) {
+                if (data.result && data.success) {
                     await this.tokenService.setToken(data.result.token);
                     await this.tokenService.setPerson(data.result.person);
                     if (await this.hubService.ConnectionChatHub(data.result.token, data.result.person.id)

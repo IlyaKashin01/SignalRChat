@@ -1,11 +1,11 @@
-.login-page {
+.signup-page {
     font-family: Arial, sans-serif;
     margin: 0;
     width: 100%;
     align-items: center;
 }
 
-.login-container {
+.signup-container {
     width: 400px;
     margin: 50px auto;
     background-color: #fff;
@@ -14,12 +14,12 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.login-container label {
+.signup-container label {
     display: block;
     margin-bottom: 5px;
 }
 
-.login-container input {
+.signup-container input {
     width: 100%;
     padding: 8px;
     margin-bottom: 15px;
@@ -28,7 +28,7 @@
     border-radius: 4px;
 }
 
-.login-container .login-button {
+.signup-container button {
     background-color: #4caf50;
     color: #fff;
     padding: 10px;
@@ -37,13 +37,14 @@
     cursor: pointer;
 }
 
-.login-container .login-button:hover {
+.signup-container button:hover {
     background-color: #45a049;
 }
 
-.registration-link {
-    color: blue;
-    cursor: pointer;
-    display: contents;
-    font-size: 16px;
-  }
+.errorAllert {
+    color: red;
+}
+
+.back-button {
+    margin-left: 1%;
+}

@@ -10,7 +10,7 @@
                     <tr *ngFor="let member of members.groupMembers" class="member">
                         <p><span *ngIf="onlineMarkers.includes(member.personId)" class="online-dot"></span> {{ member.memberLogin }} добавил
                         {{member.addedByPersonLogin}} </p>
-                        <button *ngIf="member.id !== personId"><mat-icon class="delete-person-button" aria-hidden="false" aria-label="Example home icon">close</mat-icon></button>
+                        <button *ngIf="member.personId !== personId" (click)="excludeMember(member.personId, member.memberLogin, members.creatorLogin)"><mat-icon class="delete-person-button">close</mat-icon></button>
                     </tr>
                 </td>
             </div>

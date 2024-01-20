@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "./data.service";
 import { BehaviorSubject, } from "rxjs";
-import { GroupMessage, GroupMessageRequest, GroupedMessagesInGroup, MemberRequest, MemberResponse } from "../group/Dto";
+import { GroupMessage, GroupMessageRequest, GroupedMessagesInGroup, LeaveGroupRequest, MemberRequest, MemberResponse } from "../group/Dto";
 import { GroupRequest } from "../group/Dto";
 import { HubService } from "./hub.service";
 import { PersonResponse } from "../signin/authDto";
@@ -24,7 +24,6 @@ export class GroupService {
     private usersSource = new BehaviorSubject<PersonResponse[]>([]);
     users$ = this.usersSource.asObservable();
 
-    private addedNotifications: string[] = [''];
     private addedNotificationSource = new BehaviorSubject<string[]>(['']);
     addedNotifications$ = this.addedNotificationSource.asObservable();
 
@@ -168,8 +167,8 @@ export class GroupService {
         })
     }
 
-    async LeaveGroup(groupId: number, groupName: string, personLogin: string) {
-        await this.hubConnection.invoke('LeaveGroupAsync', groupId, groupName, this.personId, personLogin)
+    async LeaveGroup(request: LeaveGroupRequest) {
+        await this.hubConnection.invoke('LeaveGroupAsync', request)
         .catch(err => console.log(err));
     }
 

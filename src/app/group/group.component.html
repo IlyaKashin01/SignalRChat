@@ -6,7 +6,7 @@
         <button class="add-member-button" (click)="openForm()">
             <i class="fa fa-user-plus"></i> Добавить участника
         </button>
-        <button class="add-member-button" (click)="leaveGroup()">
+        <button *ngIf="members.creatorLogin !== personLogin" class="add-member-button" (click)="leaveGroup()">
             <i class="fa fa-user-plus"></i> Покинуть группу
         </button>
         <button class="add-member-button" (click)="openWindow()">
@@ -14,8 +14,7 @@
         </button>
     </div>
     <member-form *ngIf="isOpen" (closeForm)="closeForm()" [groupId]="groupId"></member-form>
-    <group-window *ngIf="isOpenWindow" (closeForm)="closeWindow()" [members]="members" [onlineMarkers]="onlineMarkers" [personId]="personId"></group-window>
-    <app-notification *ngIf="showNotification" (close)="close()" [title]="groupName" [message]="notification" [isShow]="showNotification"></app-notification>
+    <group-window *ngIf="isOpenWindow" (closeForm)="closeWindow()" [members]="members" [onlineMarkers]="onlineMarkers" [personId]="personId" [groupId]="groupId" [groupName]="groupName"></group-window>
     <div class="history">
         <div *ngFor="let gropedMessages of groupMessages" class="messages">
             <p class="date-message">{{gropedMessages.sentAt | date:'dd|MM|yyyy '}}</p>

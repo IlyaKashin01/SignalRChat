@@ -4,14 +4,13 @@ import { Dialog, GroupedMessages, Message } from './Dto';
 import { DataService } from '../common/data.service';
 import { HubService } from '../common/hub.service';
 import { PersonResponse } from '../signin/authDto';
-import { HubConnection } from '@aspnet/signalr';
 import { GroupService } from '../common/group.service';
 
 @Component({
     selector: 'chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css'],
-    providers: [ChatService]
+    providers: [ChatService, GroupService]
 })
 export class ChatComponent implements OnInit {
     person: PersonResponse = this.dataService.getPerson();
@@ -39,8 +38,9 @@ export class ChatComponent implements OnInit {
     showGroup: boolean = false;
     showUserForm: boolean = false;
     isGroupForm: boolean = false;
+    showNotification: boolean = false;
 
-    constructor(private chatHub: ChatService, private dataService: DataService, private hubService: HubService) {
+    constructor(private chatHub: ChatService, private groupHub: GroupService, private dataService: DataService, private hubService: HubService) {
     }
 
     async ngOnInit(): Promise<void> {
@@ -76,8 +76,25 @@ export class ChatComponent implements OnInit {
             });
             this.chatHub.notification$.subscribe((content: string) => {
                 this.notification = content;
+                if(this.notification !== '')
+                this.showNotification = true;
             });
         }
+        if(await this.hubService.getGroupPromiseStart() !== null) {
+            await this.groupHub.subscribeNotification();
+            this.groupHub.groupName$.subscribe((name: string) => {
+                this.nameDialogNotification = name;
+            });
+            this.groupHub.notification$.subscribe((content: string) => {
+                this.notification = content;
+                if(this.notification !== '')
+                this.showNotification = true;
+            });
+        }
+    }
+
+    close() {
+        this.showNotification = false;
     }
 
     async onKeyChat(id: number, name: string) {

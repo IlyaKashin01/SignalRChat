@@ -54,3 +54,12 @@ export class MemberInGroup {
         public addedDate: Date
     ) { }
 }
+
+export class LeaveGroupRequest {
+    constructor(
+        public groupId: number, 
+        public personId: number,
+        public personLogin: string, 
+        public creatorLogin: string
+    ){}
+}

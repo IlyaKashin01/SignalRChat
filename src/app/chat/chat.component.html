@@ -7,8 +7,8 @@
             <button (click)="openGroupForm()" class="open-button">Новая группа</button>
             <group-form *ngIf="isGroupForm" (closeForm)="closeGroupForm()"></group-form>
         </div>
-        <app-notification *ngIf="notification !== ''" [title]="nameDialogNotification"
-            [message]="notification" [isShow]="true"></app-notification>
+        <app-notification *ngIf="showNotification" (close)="close()" [title]="nameDialogNotification" [message]="notification" [isShow]="showNotification"></app-notification>
+        
         <div class="dialogs-panel">
             <div *ngFor="let dialog of dialogs">
                 <button *ngIf="dialog.isGroup === false" class="dialog-button"

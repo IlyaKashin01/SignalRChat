@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, } from '@angular/core';
 import { GroupService } from '../common/group.service';
-import { GroupMessage, GroupedMessagesInGroup, MemberResponse } from './Dto';
+import { GroupedMessagesInGroup, LeaveGroupRequest, MemberResponse } from './Dto';
 import { DataService } from '../common/data.service';
 import { HubService } from '../common/hub.service';
 
@@ -43,7 +43,6 @@ export class GroupComponent implements OnChanges {
                     await this.groupHub.subscribeNewGroupMessages();
                     await this.groupHub.subscribeGroupMembers();
                     await this.groupHub.subscribeJoinPersonToGroup();
-                    await this.groupHub.subscribeNotification();    
                     await this.groupHub.subscribeMessagesWithNewStatus();
                     await this.groupHub.subscribePersonStatus();
                     this.groupHub.groupmessages$.subscribe((messages: GroupedMessagesInGroup[]) => {
@@ -52,13 +51,6 @@ export class GroupComponent implements OnChanges {
                     this.groupHub.members$.subscribe((members: MemberResponse) => {
                         this.members = members;
                         this.countMembers = members.groupMembers.length + 1;
-                    });
-                    this.groupHub.groupName$.subscribe((name: string) => {
-                        this.groupName = name;
-                    });
-                    this.groupHub.notification$.subscribe((notification: string) => {
-                        this.notification = notification;
-                        this.showNotification = true;
                     });
                     this.groupHub.status$.subscribe((status: boolean) => {
                         this.personStatus = status;
@@ -104,7 +96,7 @@ export class GroupComponent implements OnChanges {
         await this.groupHub.ChangeStatusIncomingMessages(this.groupId, this.nameGroup);
     }
     async leaveGroup() {
-        await this.groupHub.LeaveGroup(this.groupId, this.nameGroup, this.personLogin);
+        await this.groupHub.LeaveGroup(new LeaveGroupRequest(this.groupId, this.personId, this.personLogin, ""));
     }
     async returnToGroup() {
         await this.groupHub.ReturnToGroup(this.groupId, this.nameGroup, this.personLogin);

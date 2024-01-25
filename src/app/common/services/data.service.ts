@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { PersonResponse } from '../signin/authDto';
+import { PersonResponse } from '../DTO/authDto';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {

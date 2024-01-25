@@ -2,9 +2,9 @@ import { Injectable } from "@angular/core";
 import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "./data.service";
 import { BehaviorSubject, elementAt, } from "rxjs";
-import { Dialog, GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "../chat/Dto";
+import { Dialog, GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "../DTO/chatDto";
 import { HubService } from "./hub.service";
-import { PersonResponse } from "../signin/authDto";
+import { PersonResponse } from "../DTO/authDto";
 
 @Injectable()
 export class ChatService {
@@ -67,7 +67,7 @@ export class ChatService {
         })
     }
     async sendMessage(message: string, recipientId: number, isNewDialog: boolean) {
-        await this.hubConnection.invoke('SendPersonalMessage', new SendMessageRequest(this.personId, recipientId, message, isNewDialog))
+        await this.hubConnection.invoke('SendPersonalMessage', new SendMessageRequest(this.dataService.getPerson().login, this.personId, recipientId, message, isNewDialog))
             .then(() => console.log('сообщение отправлено'))
             .catch(error => console.error(`Ошибка при отправке сообщения от ${this.personId}:`, error));
     }
@@ -118,16 +118,17 @@ export class ChatService {
             .catch(error => console.error('диалоги не найдены', error));
     }
     async subscribeNewDialog() {
-        await this.hubConnection.on('AllDialogs', (dialog: Dialog) => {
-            this.dialogs.push(dialog)
-            this.dialogsSourse.next(this.dialogs)
+        await this.hubConnection.on('NewDialog', (dialog: Dialog) => {
+            this.dialogs.push(dialog);
+            this.dialogs.sort((a, b) => a.name.localeCompare(b.name));
+            this.dialogsSourse.next(this.dialogs);
             console.log('новый диалог: ', dialog);
         })
     }
     async subscribeUsers() {
         await this.hubConnection.on('AllUsers', (users: PersonResponse[]) => {
             this.usersSource.next(users);
-            console.log('список пользователей', users);
+            console.log('список доступных пользователей', users);
         })
     }
 
@@ -150,7 +151,7 @@ export class ChatService {
                         existingGroup.messages = existingGroup.messages.filter(msg => msg.isCheck !== false);
                         existingGroup.messages.push(message);
                     }
-                    console.log('новое сообщение:', message);
+                    console.log('сообщение, отмеченное прочитанным:', message);
                 })
             });
 

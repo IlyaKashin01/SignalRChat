@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../common/http.service';
+import { AuthService } from '../common/services/http.service';
 import { Router } from '@angular/router';
-import { DataService } from '../common/data.service';
-import { HubService } from '../common/hub.service';
-import { AuthRequest, AuthResponse, OperationResult, SignUpRequest } from '../signin/authDto';
+import { DataService } from '../common/services/data.service';
+import { HubService } from '../common/services/hub.service';
+import { AuthRequest, AuthResponse, OperationResult, SignUpRequest } from '../common/DTO/authDto';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({

@@ -23,6 +23,7 @@ export class GroupedMessages {
 
 export class SendMessageRequest {
     constructor(
+        public personId: string,
         public senderId: number,
         public recipientId: number,
         public content: string,
@@ -44,6 +45,9 @@ export class Dialog {
         public lastMessage: string,
         public isCheck: boolean,
         public dateTime: Date,
-        public isGroup: boolean
+        public countUnreadMessages: number,
+        public isGroup: boolean,
+        public countMembers: number,
+        public creatorLogin: string
     ) { }
 }

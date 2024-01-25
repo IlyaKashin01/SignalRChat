@@ -178,3 +178,22 @@
     border-radius: 50%;
     margin-left: 5px;
 }
+
+.unread-badge {
+    background-color: blue;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .dialog-name-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .dialog-name {
+    flex: 1;
+  }
+  

@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { PersonResponse } from 'src/app/signin/authDto';
-import { GroupService } from '../../common/group.service';
-import { ChatService } from 'src/app/common/chat.service';
-import { HubService } from 'src/app/common/hub.service';
+import { PersonResponse } from 'src/app/common/DTO/authDto';
+import { GroupService } from '../../common/services/group.service';
+import { ChatService } from 'src/app/common/services/chat.service';
+import { HubService } from 'src/app/common/services/hub.service';
 
 @Component({
     selector: 'member-form',

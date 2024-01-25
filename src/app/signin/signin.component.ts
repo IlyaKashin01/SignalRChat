@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../common/http.service';
-import { AuthRequest, AuthResponse, OperationResult } from './authDto';
+import { AuthService } from '../common/services/http.service';
+import { AuthRequest, AuthResponse, OperationResult } from '../common/DTO/authDto';
 import { Router } from '@angular/router';
-import { DataService } from '../common/data.service';
-import { HubService } from '../common/hub.service';
+import { DataService } from '../common/services/data.service';
+import { HubService } from '../common/services/hub.service';
 
 @Component({
     selector: 'signin',

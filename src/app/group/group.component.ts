@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, SimpleChanges, } from '@angular/core';
-import { GroupService } from '../common/group.service';
-import { GroupedMessagesInGroup, LeaveGroupRequest, MemberResponse } from './Dto';
-import { DataService } from '../common/data.service';
-import { HubService } from '../common/hub.service';
+import { GroupService } from '../common/services/group.service';
+import { GroupedMessagesInGroup, LeaveGroupRequest, MemberResponse } from '../common/DTO/groupDto';
+import { DataService } from '../common/services/data.service';
+import { HubService } from '../common/services/hub.service';
 
 @Component({
     selector: 'group',
@@ -12,15 +12,15 @@ import { HubService } from '../common/hub.service';
 })
 export class GroupComponent implements OnChanges {
     @Input() nameGroup: string = "";
+    @Input() countMembers: number = 0;
     @Input() groupId: number = 0;
+    @Input() creatorLogin: string = "";
     @Input() personLogin: string = "";
     @Input() onlineMarkers: number[] = [];
 
     message: string = "";
 
     groupMessages: GroupedMessagesInGroup[] = [];
-    members: MemberResponse = new MemberResponse("", []);
-    countMembers: number = 0;
     addedNotifications: string[] = [''];
     groupName: string = '';
     notification: string = '';
@@ -41,27 +41,21 @@ export class GroupComponent implements OnChanges {
                     await this.groupHub.errorSubscribe();
                     await this.groupHub.subscribeGroupMessages();
                     await this.groupHub.subscribeNewGroupMessages();
-                    await this.groupHub.subscribeGroupMembers();
                     await this.groupHub.subscribeJoinPersonToGroup();
                     await this.groupHub.subscribeMessagesWithNewStatus();
                     await this.groupHub.subscribePersonStatus();
                     this.groupHub.groupmessages$.subscribe((messages: GroupedMessagesInGroup[]) => {
                         this.groupMessages = messages;
                     });
-                    this.groupHub.members$.subscribe((members: MemberResponse) => {
-                        this.members = members;
-                        this.countMembers = members.groupMembers.length + 1;
-                    });
                     this.groupHub.status$.subscribe((status: boolean) => {
                         this.personStatus = status;
                     })
                     this.groupHub.error$.subscribe((error: string) => {
-                        console.log(error);
+                        console.error(error);
                     })
                     this.isSubsctibed = true;
                 }
                 await this.groupHub.getGroupMessages(this.groupId);
-                await this.groupHub.getGroupMembers(this.groupId);
             }
         }
     }

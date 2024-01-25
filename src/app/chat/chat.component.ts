@@ -1,10 +1,10 @@
-import { Component, Input, OnInit, } from '@angular/core';
-import { ChatService } from '../common/chat.service';
-import { Dialog, GroupedMessages, Message } from './Dto';
-import { DataService } from '../common/data.service';
-import { HubService } from '../common/hub.service';
-import { PersonResponse } from '../signin/authDto';
-import { GroupService } from '../common/group.service';
+import { ChangeDetectorRef, Component, Input, OnInit, } from '@angular/core';
+import { ChatService } from '../common/services/chat.service';
+import { Dialog, GroupedMessages, Message } from '../common/DTO/chatDto';
+import { DataService } from '../common/services/data.service';
+import { HubService } from '../common/services/hub.service';
+import { PersonResponse } from '../common/DTO/authDto';
+import { GroupService } from '../common/services/group.service';
 
 @Component({
     selector: 'chat',
@@ -28,8 +28,8 @@ export class ChatComponent implements OnInit {
 
     groupId: number = 0;
     nameGroup: string = "";
-
-    users: PersonResponse[] = [];
+    countMembers: number = 0;
+    creatorLogin: string = "";
 
     nameDialogNotification: string = '';
     notification: string = '';
@@ -39,8 +39,9 @@ export class ChatComponent implements OnInit {
     showUserForm: boolean = false;
     isGroupForm: boolean = false;
     showNotification: boolean = false;
+    checked: boolean = false;
 
-    constructor(private chatHub: ChatService, private groupHub: GroupService, private dataService: DataService, private hubService: HubService) {
+    constructor(private chatHub: ChatService, private groupHub: GroupService, private dataService: DataService, private hubService: HubService, private cdr: ChangeDetectorRef) {
     }
 
     async ngOnInit(): Promise<void> {
@@ -49,16 +50,11 @@ export class ChatComponent implements OnInit {
             await this.chatHub.subscribeNotification();
             await this.chatHub.subscribeDialogs();
             await this.chatHub.subscribeNewDialog();
-            await this.chatHub.subscribeUsers();
             this.chatHub.dialogs$.subscribe((dialogs: Dialog[]) => {
                 this.dialogs = dialogs;
             });
-            this.chatHub.users$.subscribe((users: PersonResponse[]) => {
-                this.users = users;
-            });
             await this.chatHub.getDialogs();
             await this.chatHub.getOnlineMarkers();
-            await this.chatHub.getUsers();
             await this.chatHub.subscribeAllPersonalMessages();
             await this.chatHub.subscribeNewPersonalMessages();
             await this.chatHub.subscribeMessagesWithNewStatus();
@@ -80,15 +76,22 @@ export class ChatComponent implements OnInit {
                 this.showNotification = true;
             });
         }
-        if(await this.hubService.getGroupPromiseStart() !== null) {
+        if (await this.hubService.getGroupPromiseStart() !== null) {
             await this.groupHub.subscribeNotification();
             this.groupHub.groupName$.subscribe((name: string) => {
                 this.nameDialogNotification = name;
             });
             this.groupHub.notification$.subscribe((content: string) => {
                 this.notification = content;
-                if(this.notification !== '')
-                this.showNotification = true;
+                if (this.notification !== '')
+                    this.showNotification = true;
+            });
+            await this.groupHub.subscribeNewGroup();
+            this.groupHub.newGroup$.subscribe((dialog: Dialog) => {
+                if(dialog.id !== 0){
+                this.dialogs.push(dialog);
+                this.dialogs.sort((a, b) => a.name.localeCompare(b.name));
+                }
             });
         }
     }
@@ -107,12 +110,14 @@ export class ChatComponent implements OnInit {
         await this.chatHub.getAllPersonalMessages(id);
     }
 
-    async onKeyGroup(id: number, name: string) {
+    async onKeyGroup(id: number, name: string, countMembers: number, creatorLogin: string) {
         this.groupId = id;
+        this.nameGroup = name;
+        this.countMembers = countMembers;
+        this.creatorLogin = creatorLogin;
         if (this.showChat === true)
             this.showChat = false;
         this.showGroup = true;
-        this.nameGroup = name;
     }
 
     async sendMessage() {
@@ -120,6 +125,7 @@ export class ChatComponent implements OnInit {
         this.message = '';
     }
     async changeStatusMessages() {
+        this.checked = true;
         await this.chatHub.ChangeStatusIncomingMessages(this.recipientId);
     }
     openUserForm() {

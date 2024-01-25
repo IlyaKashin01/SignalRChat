@@ -1,25 +1,25 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { PersonResponse } from 'src/app/signin/authDto';
-import { GroupService } from '../../common/group.service';
-import { ChatService } from 'src/app/common/chat.service';
-import { HubService } from 'src/app/common/hub.service';
+import { PersonResponse } from 'src/app/common/DTO/authDto';
+import { GroupService } from '../../common/services/group.service';
+import { HubService } from 'src/app/common/services/hub.service';
+import { Dialog } from 'src/app/common/DTO/chatDto';
 
 @Component({
     selector: 'group-form',
     templateUrl: './createGroup.component.html',
     styleUrls: ['./createGroup.component.css'],
-    providers: [GroupService, ChatService]
+    providers: [GroupService]
 })
 export class GroupFormComponent implements OnInit {
     users: PersonResponse[] = [];
     @Output() closeForm = new EventEmitter<void>();
+    dialog: Dialog = new Dialog(0,"", "", false, new Date(), 0, false, 0, "");
     selectedUserId: number[] = [];
-    groupId: number = 0;
     message: string = "";
     name: string = "";
     isSelected: boolean = false;
     isCreated: boolean = false;
-    constructor(private groupHub: GroupService, private chatHub: ChatService, private hubService: HubService) {
+    constructor(private groupHub: GroupService, private hubService: HubService) {
     }
     async ngOnInit(): Promise<void> {
         if (await this.hubService.getGroupPromiseStart() !== null) {
@@ -28,10 +28,9 @@ export class GroupFormComponent implements OnInit {
                 this.users = users;
             });
             await this.groupHub.subscribeNewGroup();
-            this.groupHub.newGroupId$.subscribe((key: number) => {
-                this.groupId = key;
+            this.groupHub.newGroup$.subscribe((dialog: Dialog) => {
+                this.dialog = dialog;
             });
-            await this.groupHub.getUsers(this.groupId);
         }
     }
     close() {
@@ -50,13 +49,14 @@ export class GroupFormComponent implements OnInit {
 
     async create() {
         await this.groupHub.createGroup(this.name);
-        this.chatHub.getDialogs();
-        this.groupHub.getUsers(this.groupId);
+        await this.groupHub.getUsers(this.dialog.id);
         this.isCreated = true;
     }
     async joinToGroup() {
+        console.log(this.dialog.id);
+        
         await this.selectedUserId.forEach(async id => {
-            await this.groupHub.joinPersonToGroup(this.groupId, id);
+            await this.groupHub.joinPersonToGroup(this.dialog.id, id);
         });
         this.close();
     }

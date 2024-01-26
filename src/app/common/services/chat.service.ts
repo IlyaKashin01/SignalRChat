@@ -36,14 +36,12 @@ export class ChatService {
     private notificationSource = new BehaviorSubject<string>('');
     notification$ = this.notificationSource.asObservable();
 
-    error: string = '';
     private errorSource = new BehaviorSubject<string>('');
     error$ = this.errorSource.asObservable();
 
     async errorSubscribe() {
         await this.hubConnection.on("Error", (error: string) => {
-            this.error = error;
-            this.errorSource.next(this.error);
+            this.errorSource.next(error);
         })
     }
 

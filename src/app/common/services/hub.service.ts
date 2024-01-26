@@ -29,6 +29,19 @@ export class HubService {
         return this.chatHubConnection;
     }
 
+    DisconnectionChatHub() {
+        if (this.chatHubConnection)
+            this.chatHubConnection.stop()
+                .then(() => {
+                    console.log('Соединение с ChatHub завершено');
+                })
+                .catch(error => {
+                    console.error('Ошибка при отключении от ChatHub:', error);
+                });
+        else
+            console.error('Ошибка при отключении от хаба: chatHubConnection undefined');
+    }
+
     ConnectionGroupHub(token: string, id: number) {
         this.groupHubConnection = new HubConnectionBuilder()
             .withUrl(`https://localhost:7130/group?access_token=${token}`)
@@ -44,6 +57,19 @@ export class HubService {
 
         return this.groupHubConnection;
     }
+
+    DisconnectionGroupHub() {
+        if (this.groupHubConnection)
+            this.groupHubConnection.stop()
+                .then(() => {
+                    console.log('Соединение с GroupHub завершено');
+                })
+                .catch(error => {
+                    console.error('Ошибка при отключении от GroupHub:', error);
+                });
+        else
+            console.error('Ошибка при отключении от хаба: groupHubConnection undefined');
+    }
     getChatConnection() { return this.chatHubConnection; }
     getGroupConnection() { return this.groupHubConnection; }
     getChatPromiseStart() { return this.chatPromiseStart; }
@@ -55,6 +81,6 @@ export class HubService {
             .then(() => console.log('Пользователь подключен к группам'))
             .catch(error => console.error('Ошибка при подключении к группам:', error));
         else
-            console.log(`Пользователь не был подключен к группам, т.к. ${this.groupHubConnection} undefined`);
+            console.log(`Пользователь не был подключен к группам, т.к. groupHubConnection undefined`);
     }
 }

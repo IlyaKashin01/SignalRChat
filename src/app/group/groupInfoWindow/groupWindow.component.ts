@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { PersonResponse } from 'src/app/common/DTO/authDto';
 import { GroupService } from '../../common/services/group.service';
-import { ChatService } from 'src/app/common/services/chat.service';
 import { LeaveGroupRequest, MemberResponse } from '../../common/DTO/groupDto';
 import { DataService } from 'src/app/common/services/data.service';
 import { HubService } from 'src/app/common/services/hub.service';

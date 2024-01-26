@@ -8,6 +8,7 @@ import { GroupModule } from '../group/group.module';
 import { UserFormModule } from './form/dialogForm.module';
 import { GroupFormModule } from '../group/groupForm/createGroup.module';
 import { NotificationModule } from "../notification/notification.module";
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
     declarations: [
@@ -15,6 +16,16 @@ import { NotificationModule } from "../notification/notification.module";
     ],
     providers: [],
     bootstrap: [ChatComponent],
-    imports: [CommonModule, BrowserModule, FormsModule, AppRoutingModule, GroupModule, UserFormModule, GroupFormModule, NotificationModule]
+    imports: [
+        CommonModule, 
+        BrowserModule, 
+        FormsModule, 
+        AppRoutingModule, 
+        GroupModule, 
+        UserFormModule, 
+        GroupFormModule, 
+        NotificationModule,
+        MatIconModule
+    ]
 })
 export class ChatModule { }

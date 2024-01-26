@@ -5,6 +5,7 @@ import { DataService } from '../common/services/data.service';
 import { HubService } from '../common/services/hub.service';
 import { PersonResponse } from '../common/DTO/authDto';
 import { GroupService } from '../common/services/group.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'chat',
@@ -41,11 +42,12 @@ export class ChatComponent implements OnInit {
     showNotification: boolean = false;
     checked: boolean = false;
 
-    constructor(private chatHub: ChatService, private groupHub: GroupService, private dataService: DataService, private hubService: HubService, private cdr: ChangeDetectorRef) {
+    constructor(private router: Router, private chatHub: ChatService, private groupHub: GroupService, private dataService: DataService, private hubService: HubService, private cdr: ChangeDetectorRef) {
     }
 
     async ngOnInit(): Promise<void> {
         if (await this.hubService.getChatPromiseStart() !== null) {
+            await this.chatHub.errorSubscribe()
             await this.chatHub.subscribeOnlineMarkers();
             await this.chatHub.subscribeNotification();
             await this.chatHub.subscribeDialogs();
@@ -75,6 +77,10 @@ export class ChatComponent implements OnInit {
                 if(this.notification !== '')
                 this.showNotification = true;
             });
+            this.chatHub.error$.subscribe((error: string) => {
+                if(error !== "")
+                    console.error(error);
+            })
         }
         if (await this.hubService.getGroupPromiseStart() !== null) {
             await this.groupHub.subscribeNotification();
@@ -127,6 +133,12 @@ export class ChatComponent implements OnInit {
     async changeStatusMessages() {
         this.checked = true;
         await this.chatHub.ChangeStatusIncomingMessages(this.recipientId);
+    }
+    async logout() {
+        await this.groupHub.onDisconnectedGroups();
+        this.hubService.DisconnectionChatHub();
+        this.hubService.DisconnectionGroupHub();
+        this.router.navigate(['']);
     }
     openUserForm() {
         this.showUserForm = true;

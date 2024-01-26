@@ -59,8 +59,7 @@
 }
 
 .form-buttons {
-    display: flex;
-    flex-direction: column;
+    background-color: #4caf50;
 }
 
 .input-container {

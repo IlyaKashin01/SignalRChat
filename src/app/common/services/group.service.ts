@@ -122,7 +122,7 @@ export class GroupService {
 
     async getGroupMembers(groupId: number) {
         await this.hubConnection.invoke("GetAllMembersInGroup", groupId)
-            .catch(err => console.log(err));
+            .catch(err => console.error(err));
     }
 
     async subscribeGroupMembers() {
@@ -141,12 +141,12 @@ export class GroupService {
 
     async getUsers(groupId: number) {
         await this.hubConnection.invoke('GetAllUsersToAddGroup', groupId, this.personId)
-            .catch(err => console.log(err));
+            .catch(err => console.error(err));
     }
 
     async ChangeStatusIncomingMessages(groupId: number, groupName: string) {
         await this.hubConnection.invoke('ChangeStatusIncomingMessagesAsync', groupId, groupName)
-        .catch(err => console.log(err));
+        .catch(err => console.error(err));
     }
 
     async subscribeMessagesWithNewStatus() {
@@ -168,12 +168,12 @@ export class GroupService {
 
     async LeaveGroup(request: LeaveGroupRequest) {
         await this.hubConnection.invoke('LeaveGroupAsync', request)
-        .catch(err => console.log(err));
+        .catch(err => console.error(err));
     }
 
     async ReturnToGroup(groupId: number, groupName: string, personLogin: string) {
         await this.hubConnection.invoke('ReturnToGroupAsync', groupId, groupName, this.personId, personLogin)
-        .catch(err => console.log(err));
+        .catch(err => console.error(err));
     }
 
     async subscribePersonStatus() {
@@ -181,5 +181,11 @@ export class GroupService {
             this.statusSource.next(status);
             console.log('статус пользователя', status);
         })
+    }
+
+    async onDisconnectedGroups() {
+        await this.hubConnection.invoke('OnDisConnectedGroupsAsync', this.personId)
+        .then(() => console.log('Пользователь отключен от групп'))
+        .catch(err => console.error(err));
     }
 }

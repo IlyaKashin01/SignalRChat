@@ -2,10 +2,11 @@
     <div class="dialogs-container">
         <p>{{person.login}}<span *ngIf="onlineMarkers.includes(personId)" class="online-dot"></span></p>
         <div class="form-buttons">
-            <button (click)="openUserForm()" class="open-button">Новый диалог</button>
+            <button (click)="openUserForm()" class="open-button"><mat-icon>person_add_alt_1</mat-icon></button>
             <app-user-form *ngIf="showUserForm" (closeForm)="closeUserForm()"></app-user-form>
-            <button (click)="openGroupForm()" class="open-button">Новая группа</button>
+            <button (click)="openGroupForm()" class="open-button"><mat-icon >group_add</mat-icon></button>
             <group-form *ngIf="isGroupForm" (closeForm)="closeGroupForm()"></group-form>
+            <button (click)="logout()" class="open-button"><mat-icon>exit_to_app</mat-icon></button>
         </div>
         <app-notification *ngIf="showNotification" (close)="close()" [title]="nameDialogNotification" [message]="notification" [isShow]="showNotification"></app-notification>
         

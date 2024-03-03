@@ -3,7 +3,7 @@ import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "./data.service";
 import { BehaviorSubject, elementAt, } from "rxjs";
 import { GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "../DTO/chatDto";
-import { Dialog, Notification } from "../DTO/commonDto";
+import { Dialog, LastMessage, Notification } from "../DTO/commonDto";
 import { HubService } from "./hub.service";
 import { PersonResponse } from "../DTO/authDto";
 
@@ -21,15 +21,21 @@ export class ChatService {
     private personId: number = this.dataService.getPerson().id;
     private hubConnection: HubConnection = this.hubService.getChatConnection() || this.hubService.ConnectionChatHub(this.dataService.getToken(), this.personId);
 
-    dialogs: Dialog[] = [];
     private dialogsSourse = new BehaviorSubject<Dialog[]>([]);
     dialogs$ = this.dialogsSourse.asObservable();
+
+    private dialogSourse = new BehaviorSubject<Dialog>(new Dialog(0,"","",false,new Date(),0,"",false,0,""));
+    dialog$ = this.dialogSourse.asObservable();
 
     private onlineMarkersSourse = new BehaviorSubject<number[]>([]);
     onlineMarkers$ = this.onlineMarkersSourse.asObservable();
 
     private notificationSource = new BehaviorSubject<Notification>(new Notification("", ""));
     notification$ = this.notificationSource.asObservable();
+
+    private lastMessages: LastMessage[] = [];
+    private lastMessagesSource = new BehaviorSubject<LastMessage[]>([]);
+    lastMessages$ = this.lastMessagesSource.asObservable();
 
     private errorSource = new BehaviorSubject<string>('');
     error$ = this.errorSource.asObservable();
@@ -66,7 +72,7 @@ export class ChatService {
     async subscribeNewPersonalMessages() {
         this.hubConnection.on('NewMessage', (message: Message) => {
             const currentDate = new Date();
-            const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
+            const existingGroup = this.personalMessagesSource.value.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
             if (existingGroup) {
                 existingGroup.messages.push(message);
             }
@@ -74,14 +80,9 @@ export class ChatService {
                 this.personalMessages.push(new GroupedMessages(message.sentAt, new Array<Message>(message)))
                 this.personalMessagesSource.next(this.personalMessages)
             }
-            const existingDialog = this.dialogsSourse.value.find(x => x.id === message.senderId || x.id === message.recipientId);
-            if (existingDialog) {
-                existingDialog.lastMessage = message.content;
-                existingDialog.sentAt = message.sentAt;
-                existingDialog.isCheck = message.isCheck;
-            }
-            this.dialogsSourse.next(this.dialogs);
-            console.log('диалог, у которого должно измениться последнее сообщение:', existingDialog, this.dialogsSourse, message);
+            this.lastMessages.push(new LastMessage(message.recipientId, message.content, message.isCheck, message.sentAt, message.senderLogin));
+            this.lastMessages.push(new LastMessage(message.senderId, message.content, message.isCheck, message.sentAt, message.senderLogin));
+            this.lastMessagesSource.next(this.lastMessages);
             console.log('новое сообщение:', message);
         });
     }
@@ -93,15 +94,14 @@ export class ChatService {
     async subscribeAllPersonalMessages() {
         await this.hubConnection.on("AllPersonalMessageInDialog", (messages: GroupedMessages[]) => {
             this.personalMessages = messages;
-            this.personalMessagesSource.next(this.personalMessages);
+            this.personalMessagesSource.next(messages);
             console.log('сообщения из бд:', messages);
         });
     }
     async subscribeDialogs() {
         await this.hubConnection.on('AllDialogs', (dialogs: Dialog[]) => {
-            this.dialogs = dialogs;
-            this.dialogsSourse.next(this.dialogs);
-            console.log('диалоги из бд:', this.dialogs);
+            this.dialogsSourse.next(dialogs);
+            console.log('диалоги из бд:', dialogs);
         });
     }
     async getDialogs() {
@@ -111,9 +111,7 @@ export class ChatService {
     }
     async subscribeNewDialog() {
         await this.hubConnection.on('NewDialog', (dialog: Dialog) => {
-            this.dialogs.push(dialog);
-            this.dialogs.sort((a, b) => a.name.localeCompare(b.name));
-            this.dialogsSourse.next(this.dialogs);
+            this.dialogSourse.next(dialog);
             console.log('новый диалог: ', dialog);
         })
     }
@@ -137,7 +135,7 @@ export class ChatService {
         await this.hubConnection.on('MessagesWithNewStatus', (groupedMessages: GroupedMessages[]) => {
             const currentDate = new Date();
             groupedMessages.forEach(element => {
-                const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
+                const existingGroup = this.personalMessagesSource.value.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
                     if (existingGroup) {
                         existingGroup.messages = existingGroup.messages.map(message => {
                             const newElement = element.messages.find(x => x.id === message.id);

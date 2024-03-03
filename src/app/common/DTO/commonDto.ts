@@ -15,10 +15,10 @@ export class Dialog {
 
 export class LastMessage {
     constructor(
+        public dialogId: number,
         public message: string,
         public isCheck: boolean,
         public sentAt: Date,
-        public countUnreadMessages: number,
         public senderLogin: string,
     ){}
 }

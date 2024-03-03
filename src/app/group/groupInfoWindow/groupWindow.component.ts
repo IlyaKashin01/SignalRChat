@@ -8,7 +8,7 @@ import { HubService } from 'src/app/common/services/hub.service';
     selector: 'group-window',
     templateUrl: './groupWindow.component.html',
     styleUrls: ['./groupWindow.component.css'],
-    providers: [DataService, GroupService]
+    providers: []
 })
 export class GroupWindowComponent implements OnInit {
     @Input() members: MemberResponse = new MemberResponse("", []);

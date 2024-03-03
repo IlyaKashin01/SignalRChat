@@ -8,7 +8,7 @@ import { LastMessage } from 'src/app/common/DTO/commonDto';
 })
 export class LastMessageComponent {
   currentDate = new Date();
-  @Input() lastMessage: LastMessage = new LastMessage("", false, new Date(), 0, "")
+  @Input() lastMessage: LastMessage = new LastMessage(0,"", false, new Date(), "")
   @Input() personLogin: string = "";
 
   isDifferentYear(sentAt: Date): boolean {

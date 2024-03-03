@@ -8,7 +8,7 @@ import { HubService } from '../common/services/hub.service';
     selector: 'group',
     templateUrl: './group.component.html',
     styleUrls: ['./group.component.css'],
-    providers: [GroupService]
+    providers: []
 })
 export class GroupComponent implements OnInit {
     @ViewChild('history') history!: ElementRef;
@@ -100,9 +100,10 @@ export class GroupComponent implements OnInit {
         this.isOpen = false;
     }
     async changeStatusMessages() {
-        if(this.groupMessages.find(x => x.messages.find(x => x.isCheck === false && x.senderId === this.personId)) === null)
+        if(this.groupMessages.find(x => x.messages.find(x => x.isCheck === false && x.senderId !== this.personId)) !== null){
         await this.dataService.setHideCounterKey(this.groupId);
         await this.groupHub.ChangeStatusIncomingMessages(this.groupId, this.nameGroup);
+        }
     }
     async leaveGroup() {
         await this.groupHub.LeaveGroup(new LeaveGroupRequest(this.groupId, this.personId, this.personLogin, "", false));

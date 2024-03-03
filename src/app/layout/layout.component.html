@@ -17,9 +17,9 @@
                     <div>
                         <div class="dialog-name-container">
                             <p class="dialog-name">{{ dialog.name }}<span *ngIf="onlineMarkers.includes(dialog.id)" class="online-dot"></span></p>
-                            <p *ngIf="checked === false && dialog.countUnreadMessages !== 0" class="unread-badge">{{ dialog.countUnreadMessages }}</p>
+                            <p *ngIf="dialog.countUnreadMessages !== 0" class="unread-badge">{{ dialog.countUnreadMessages }}</p>
                         </div>
-                        <last-message [personLogin]="person.login" [lastMessage]="getLastMessage(dialog.lastMessage, dialog.isCheck, dialog.sentAt, dialog.countUnreadMessages, dialog.senderLogin)"/>
+                        <last-message [personLogin]="person.login" [lastMessage]="getLastMessage(dialog.lastMessage, dialog.isCheck, dialog.sentAt, dialog.senderLogin)"/>
                     </div>
                 </button>
                 <button *ngIf="dialog.isGroup === true" class="dialog-button"
@@ -29,7 +29,7 @@
                             <p class="dialog-name">{{ dialog.name }}</p>
                             <p *ngIf="dialog.countUnreadMessages !== 0" class="unread-badge">{{ dialog.countUnreadMessages }}</p>
                         </div>
-                        <last-message [personLogin]="person.login" [lastMessage]="getLastMessage(dialog.lastMessage, dialog.isCheck, dialog.sentAt, dialog.countUnreadMessages, dialog.senderLogin)"/>
+                        <last-message [personLogin]="person.login" [lastMessage]="getLastMessage(dialog.lastMessage, dialog.isCheck, dialog.sentAt, dialog.senderLogin)"/>
                     </div>
                 </button>
             </div>

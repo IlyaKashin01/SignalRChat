@@ -6,7 +6,7 @@ import { GroupMessage, GroupMessageRequest, GroupedMessagesInGroup, LeaveGroupRe
 import { GroupRequest } from "../DTO/groupDto";
 import { HubService } from "./hub.service";
 import { PersonResponse } from "../DTO/authDto";
-import { Dialog, Notification } from "../DTO/commonDto";
+import { Dialog, LastMessage, Notification } from "../DTO/commonDto";
 
 @Injectable()
 export class GroupService {
@@ -33,6 +33,9 @@ export class GroupService {
 
     private statusSource = new BehaviorSubject<boolean>(false);
     status$ = this.statusSource.asObservable();
+
+    private lastMessageSource = new BehaviorSubject<LastMessage>(new LastMessage(0,"",false,new Date(),""));
+    lastMessage$ = this.lastMessageSource.asObservable();
 
     token: string = "";
     personId: number = this.dataService.getPerson().id;
@@ -100,6 +103,7 @@ export class GroupService {
                 this.groupMessages.push(new GroupedMessagesInGroup(message.sentAt, new Array<GroupMessage>(message)))
                 this.groupMessagesSource.next(this.groupMessages)
             }
+            this.lastMessageSource.next(new LastMessage(message.groupId, message.content, message.isCheck, message.sentAt, message.senderLogin))
         });
     }
 

@@ -23,13 +23,13 @@ export class LayoutComponent implements OnInit {
   dialogs: Dialog[] = [];
   onlineMarkers: number[] = [];
   hideCounterKey: number = 0;
+  isNewDialog: boolean = false;
 
   notification: Notification = new Notification("", "");
 
   showUserForm: boolean = false;
   isGroupForm: boolean = false;
   showNotification: boolean = false;
-  checked: boolean = false;
   
   constructor(private router: Router, private route: ActivatedRoute, private chatHub: ChatService, private groupHub: GroupService, private dataService: DataService, private hubService: HubService, private cdr: ChangeDetectorRef) {
   }
@@ -44,14 +44,21 @@ export class LayoutComponent implements OnInit {
             this.chatHub.dialogs$.subscribe((dialogs: Dialog[]) => {
                 this.dialogs = dialogs;
             });
+            this.chatHub.dialog$.subscribe((dialog: Dialog) => {
+                this.isNewDialog = true;
+                this.dialogs.push(dialog);
+                this.dialogs.sort((a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime());
+            });
             await this.chatHub.getDialogs();
             await this.chatHub.getOnlineMarkers();
             this.chatHub.onlineMarkers$.subscribe((markers: number[]) => {
                 this.onlineMarkers = markers;
             });
             this.chatHub.notification$.subscribe((notification: Notification) => {
-                const dialog = this.dialogs.find(x => x.name === notification.title);
-                if (dialog) dialog.countUnreadMessages++;
+                if (!this.isNewDialog) {
+                    const dialog = this.dialogs.find(x => x.name === notification.title);
+                    if (dialog) dialog.countUnreadMessages++;
+                }
                 this.notification = notification;
                 if (this.notification.message !== '')
                     this.showNotification = true;
@@ -59,6 +66,17 @@ export class LayoutComponent implements OnInit {
             this.chatHub.error$.subscribe((error: string) => {
                 if (error !== "")
                     console.error(error);
+            });
+            this.chatHub.lastMessages$.subscribe((messages: LastMessage[]) =>{
+                messages.forEach(message => {
+                    const chat = this.dialogs.find(x => x.id === message.dialogId)
+                    if(chat){
+                        chat.lastMessage = message.message;
+                        chat.sentAt = message.sentAt;
+                        chat.isCheck = message.isCheck;
+                        chat.senderLogin = message.senderLogin;
+                    }
+                });
             })
         }
         if (await this.hubService.getGroupPromiseStart() !== null) {
@@ -77,6 +95,15 @@ export class LayoutComponent implements OnInit {
                     this.dialogs.sort((a, b) => a.name.localeCompare(b.name));
                 }
             });
+            this.groupHub.lastMessage$.subscribe((message: LastMessage) =>{
+                const group = this.dialogs.find(x => x.id === message.dialogId)
+                if(group){
+                    group.lastMessage = message.message;
+                    group.sentAt = message.sentAt;
+                    group.isCheck = message.isCheck;
+                    group.senderLogin = message.senderLogin;
+                }
+            })
         }
         this.dataService.hideCounterKey$.subscribe((value: number) => {
             const dialog = this.dialogs.find(x => x.id === value);
@@ -130,8 +157,8 @@ export class LayoutComponent implements OnInit {
       this.isGroupForm = false;
   }
 
-  getLastMessage(message: string, isCheck: boolean, sentAt: Date, counter: number, login: string): LastMessage
+  getLastMessage(message: string, isCheck: boolean, sentAt: Date, login: string): LastMessage
   {
-    return new LastMessage(message, isCheck, new Date(sentAt), counter, login);
+    return new LastMessage(0,message, isCheck, new Date(sentAt), login);
   }
 }

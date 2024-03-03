@@ -8,7 +8,7 @@ import { HubService } from 'src/app/common/services/hub.service';
     selector: 'member-form',
     templateUrl: './memberGroup.component.html',
     styleUrls: ['./memberGroup.component.css'],
-    providers: [GroupService, ChatService]
+    providers: []
 })
 export class MemberFormComponent implements OnInit {
     users: PersonResponse[] = [];

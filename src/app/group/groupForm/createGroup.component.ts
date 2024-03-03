@@ -8,7 +8,7 @@ import { Dialog } from 'src/app/common/DTO/commonDto';
     selector: 'group-form',
     templateUrl: './createGroup.component.html',
     styleUrls: ['./createGroup.component.css'],
-    providers: [GroupService]
+    providers: []
 })
 export class GroupFormComponent implements OnInit {
     users: PersonResponse[] = [];

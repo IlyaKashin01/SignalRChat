@@ -6,7 +6,7 @@ import { GroupMessage, GroupMessageRequest, GroupedMessagesInGroup, LeaveGroupRe
 import { GroupRequest } from "../DTO/groupDto";
 import { HubService } from "./hub.service";
 import { PersonResponse } from "../DTO/authDto";
-import { Dialog } from "../DTO/chatDto";
+import { Dialog, Notification } from "../DTO/commonDto";
 
 @Injectable()
 export class GroupService {
@@ -28,18 +28,15 @@ export class GroupService {
     private addedNotificationSource = new BehaviorSubject<string[]>(['']);
     addedNotifications$ = this.addedNotificationSource.asObservable();
 
-    private notificationSource = new BehaviorSubject<string>('');
+    private notificationSource = new BehaviorSubject<Notification>(new Notification("", ""));
     notification$ = this.notificationSource.asObservable();
-    private groupNameSource = new BehaviorSubject<string>('');
-    groupName$ = this.groupNameSource.asObservable();
 
     private statusSource = new BehaviorSubject<boolean>(false);
     status$ = this.statusSource.asObservable();
 
     token: string = "";
     personId: number = this.dataService.getPerson().id;
-    groupId: number = this.dataService.getGroupId();
-    private newGroupSource = new BehaviorSubject<Dialog>(new Dialog(0,"", "", false, new Date(), 0, false, 0, ""));
+    private newGroupSource = new BehaviorSubject<Dialog>(new Dialog(0,"", "", false, new Date(), 0, "", false, 0, ""));
     newGroup$ = this.newGroupSource.asObservable();
 
     public hubConnection: HubConnection = this.hubService.getGroupConnection() || this.hubService.ConnectionGroupHub(this.dataService.getToken(), this.personId);
@@ -56,8 +53,7 @@ export class GroupService {
     }
     async subscribeNotification() {
         await this.hubConnection.on('Notification', (groupName, message: string) => {
-            this.groupNameSource.next(groupName);
-            this.notificationSource.next(message);
+            this.notificationSource.next(new Notification(groupName,message));
             console.log('уведомление: ', groupName, message);
         })
     }
@@ -145,7 +141,7 @@ export class GroupService {
     }
 
     async ChangeStatusIncomingMessages(groupId: number, groupName: string) {
-        await this.hubConnection.invoke('ChangeStatusIncomingMessagesAsync', groupId, groupName)
+        await this.hubConnection.invoke('ChangeStatusIncomingMessagesAsync', groupId, groupName, this.personId)
         .catch(err => console.error(err));
     }
 

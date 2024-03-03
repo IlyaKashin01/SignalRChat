@@ -26,6 +26,7 @@ import {MatIconModule} from '@angular/material/icon';
         GroupFormModule, 
         NotificationModule,
         MatIconModule
-    ]
+    ],
+    exports: [ChatComponent]
 })
 export class ChatModule { }

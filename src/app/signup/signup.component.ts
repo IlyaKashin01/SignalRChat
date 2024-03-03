@@ -14,13 +14,14 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class SignUpComponent {
     registrationForm: FormGroup;
+    showError: boolean = false;
+    errorMessage: string = "";
 
     constructor(private authService: AuthService, private router: Router, private tokenService: DataService, private hubService: HubService, private formBuilder: FormBuilder) { 
         this.registrationForm = this.formBuilder.group({
             username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z]+$/)]],
             password: ['', [Validators.required, Validators.minLength(6), Validators.pattern(/^(?=.*[a-zA-Z])(?=.*[\d!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$/)]],
             confirmPassword: ['', Validators.required],
-            email: ['', [Validators.required, Validators.email]]
           }, { validators: this.passwordMatchValidator });
     }
     passwordMatchValidator(form: FormGroup) {
@@ -32,15 +33,17 @@ export class SignUpComponent {
     async signup(form: FormGroup) {
         if (this.registrationForm.valid){
             console.log("Регистрационные данные:", this.registrationForm.value);
-            this.authService.signUpRequest(new SignUpRequest(form.get('username')!.value, form.get('email')!.value, form.get('password')!.value)).subscribe({
+            this.authService.signUpRequest(new SignUpRequest(form.get('username')!.value, form.get('password')!.value)).subscribe({
                 next: async (data: OperationResult<number>) => {
                     if (data.result && data.success) {
                         await this.login(form);
                     }
-                    else
-                        console.log(data.message, data.errorCode, data.stackTrace);
                 },
-                error: error => console.log(error)
+                error: error => {
+                    console.error(error);
+                    this.showError = true;
+                    this.errorMessage = error.error.message;
+                }
             });
         }
         else{
@@ -66,10 +69,8 @@ export class SignUpComponent {
                         this.router.navigate(['/chat']);
                     }
                 }
-                else
-                    console.log(data.message, data.errorCode, data.stackTrace);
             },
-            error: error => console.log(error)
+            error: error => console.error(error)
         });
     }
 

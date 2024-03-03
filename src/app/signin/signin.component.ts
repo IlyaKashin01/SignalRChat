@@ -14,6 +14,8 @@ import { HubService } from '../common/services/hub.service';
 export class SignInComponent {
     username: string = "";
     password: string = "";
+    showError: boolean = false;
+    errorMessage: string = "";
     constructor(private authService: AuthService, private router: Router, private tokenService: DataService, private hubService: HubService) { }
 
     onKeyLogin(event: any) {
@@ -33,13 +35,21 @@ export class SignInComponent {
                     await this.tokenService.setPerson(data.result.person);
                     if (await this.hubService.ConnectionChatHub(data.result.token, data.result.person.id)
                         && await this.hubService.ConnectionGroupHub(data.result.token, data.result.person.id)) {
-                        this.router.navigate(['/chat']);
+                        this.router.navigate(['/home']);
                     }
                 }
                 else
-                    console.log(data.message, data.errorCode, data.stackTrace);
+                {
+                    this.showError = true;
+                    this.errorMessage = data.message;
+                    console.log(this.errorMessage);
+                }
             },
-            error: error => console.log(error)
+            error: error => {
+                console.error(error)
+                this.showError = true;
+                this.errorMessage = error.error.message;
+            }
         });
     }
 }

@@ -3,19 +3,19 @@
         <div class="chat-header">
             <p>{{nameGroup}}, <ng-icon name="heroUsers"></ng-icon> {{countMembers}}</p>
         </div>
-        <button class="add-member-button" (click)="openForm()">
-            <i class="fa fa-user-plus"></i> Добавить участника
+        <button class="button" (click)="openForm()">
+            <i class="fa fa-user-plus"></i> <mat-icon>person_add_alt</mat-icon>
         </button>
-        <button *ngIf="creatorLogin !== personLogin" class="add-member-button" (click)="leaveGroup()">
-            <i class="fa fa-user-plus"></i> Покинуть группу
+        <button *ngIf="creatorLogin !== personLogin" class="button" (click)="leaveGroup()">
+            <i class="fa fa-user-plus"></i> <mat-icon>logout</mat-icon>
         </button>
-        <button class="add-member-button" (click)="openWindow()">
-            <i class="fa fa-user-plus"></i> Информация
+        <button class="button" (click)="openWindow()">
+            <i class="fa fa-user-plus"></i> <mat-icon>info</mat-icon>
         </button>
     </div>
     <member-form *ngIf="isOpen" (closeForm)="closeForm()" [groupId]="groupId"></member-form>
     <group-window *ngIf="isOpenWindow" (closeForm)="closeWindow()" [onlineMarkers]="onlineMarkers" [personId]="personId" [groupId]="groupId" [groupName]="groupName"></group-window>
-    <div class="history">
+    <div class="history" #history>
         <div *ngFor="let gropedMessages of groupMessages" class="messages">
             <p class="date-message">{{gropedMessages.sentAt | date:'dd|MM|yyyy '}}</p>
             <div *ngFor="let message of gropedMessages.messages">
@@ -54,7 +54,7 @@
     <div class="input-container">
         <input class="message-input" (keyup.enter)="sendGroupMessage()" [(ngModel)]="message" (focus)="changeStatusMessages()" [disabled]="personStatus">
         <button class="send-button" (click)="sendGroupMessage()" [disabled]="personStatus">
-            Отправить сообщение
+            <mat-icon>send</mat-icon>
         </button>
     </div>
 </div>

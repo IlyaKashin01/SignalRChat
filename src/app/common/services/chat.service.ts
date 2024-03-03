@@ -2,7 +2,8 @@ import { Injectable } from "@angular/core";
 import { HubConnection, } from "@aspnet/signalr";
 import { DataService } from "./data.service";
 import { BehaviorSubject, elementAt, } from "rxjs";
-import { Dialog, GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "../DTO/chatDto";
+import { GetMessagesRequest, GroupedMessages, Message, SendMessageRequest } from "../DTO/chatDto";
+import { Dialog, Notification } from "../DTO/commonDto";
 import { HubService } from "./hub.service";
 import { PersonResponse } from "../DTO/authDto";
 
@@ -13,9 +14,6 @@ export class ChatService {
     private personalMessages: GroupedMessages[] = [];
     private personalMessagesSource = new BehaviorSubject<GroupedMessages[]>([]);
     personalmessages$ = this.personalMessagesSource.asObservable();
-
-    private messageSource = new BehaviorSubject<Message>(new Message(0, 0, "", 0, "", new Date, false));
-    message$ = this.messageSource.asObservable();
 
     private usersSource = new BehaviorSubject<PersonResponse[]>([]);
     users$ = this.usersSource.asObservable();
@@ -30,10 +28,7 @@ export class ChatService {
     private onlineMarkersSourse = new BehaviorSubject<number[]>([]);
     onlineMarkers$ = this.onlineMarkersSourse.asObservable();
 
-    private nameDialogSource = new BehaviorSubject<string>('');
-    nameDialog$ = this.nameDialogSource.asObservable();
-
-    private notificationSource = new BehaviorSubject<string>('');
+    private notificationSource = new BehaviorSubject<Notification>(new Notification("", ""));
     notification$ = this.notificationSource.asObservable();
 
     private errorSource = new BehaviorSubject<string>('');
@@ -53,8 +48,7 @@ export class ChatService {
 
     async subscribeNotification() {
         await this.hubConnection.on('Notification', (name, message: string) => {
-            this.nameDialogSource.next(name);
-            this.notificationSource.next(message);
+            this.notificationSource.next(new Notification(name, message));
             console.log('уведомление: ', name, message);
         })
     }
@@ -65,13 +59,12 @@ export class ChatService {
         })
     }
     async sendMessage(message: string, recipientId: number, isNewDialog: boolean) {
-        await this.hubConnection.invoke('SendPersonalMessage', new SendMessageRequest(this.dataService.getPerson().login, this.personId, recipientId, message, isNewDialog))
+        await this.hubConnection.invoke('SendPersonalMessage', new SendMessageRequest(this.personId, recipientId, message, isNewDialog))
             .then(() => console.log('сообщение отправлено'))
             .catch(error => console.error(`Ошибка при отправке сообщения от ${this.personId}:`, error));
     }
     async subscribeNewPersonalMessages() {
         this.hubConnection.on('NewMessage', (message: Message) => {
-            this.messageSource.next(message);
             const currentDate = new Date();
             const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
             if (existingGroup) {
@@ -81,13 +74,14 @@ export class ChatService {
                 this.personalMessages.push(new GroupedMessages(message.sentAt, new Array<Message>(message)))
                 this.personalMessagesSource.next(this.personalMessages)
             }
-            const existingDialog = this.dialogs.find(X => X.id === message.recipientId);
+            const existingDialog = this.dialogsSourse.value.find(x => x.id === message.senderId || x.id === message.recipientId);
             if (existingDialog) {
                 existingDialog.lastMessage = message.content;
-                existingDialog.dateTime = message.sentAt;
+                existingDialog.sentAt = message.sentAt;
                 existingDialog.isCheck = message.isCheck;
             }
             this.dialogsSourse.next(this.dialogs);
+            console.log('диалог, у которого должно измениться последнее сообщение:', existingDialog, this.dialogsSourse, message);
             console.log('новое сообщение:', message);
         });
     }
@@ -143,14 +137,14 @@ export class ChatService {
         await this.hubConnection.on('MessagesWithNewStatus', (groupedMessages: GroupedMessages[]) => {
             const currentDate = new Date();
             groupedMessages.forEach(element => {
-                element.messages.forEach(message => {
-                    const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
+                const existingGroup = this.personalMessages.find(group => new Date(group.sentAt).toDateString() === currentDate.toDateString());
                     if (existingGroup) {
-                        existingGroup.messages = existingGroup.messages.filter(msg => msg.isCheck !== false);
-                        existingGroup.messages.push(message);
+                        existingGroup.messages = existingGroup.messages.map(message => {
+                            const newElement = element.messages.find(x => x.id === message.id);
+                            return newElement ? newElement : message;
+                        })
+                        console.log('сообщения, отмеченные прочитанными:', element.messages);
                     }
-                    console.log('сообщение, отмеченное прочитанным:', message);
-                })
             });
 
         })

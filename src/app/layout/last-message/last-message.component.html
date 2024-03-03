@@ -1,0 +1,38 @@
+<p >
+    <ng-container [ngSwitch]="isDifferentYear(lastMessage.sentAt)">
+        <ng-container *ngSwitchCase="true">
+            <ng-container [ngSwitch]="lastMessage.senderLogin === personLogin">
+                <ng-container *ngSwitchCase="true">
+                    Вы: {{ lastMessage.message }} - {{ lastMessage.sentAt | date: 'dd MMM yyyy' }}
+                </ng-container>
+                <ng-container *ngSwitchCase="false">
+                    {{lastMessage.senderLogin}}: {{ lastMessage.message }} - {{ lastMessage.sentAt | date: 'dd MMM yyyy' }}
+                </ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+            <ng-container [ngSwitch]="isDifferentDay(lastMessage.sentAt)">
+                <ng-container *ngSwitchCase="true">
+                    <ng-container [ngSwitch]="lastMessage.senderLogin === personLogin">
+                        <ng-container *ngSwitchCase="true">
+                            Вы: {{ lastMessage.message }} - {{ lastMessage.sentAt | date: 'dd MMM' }}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="false">
+                            {{lastMessage.senderLogin}}: {{ lastMessage.message }} - {{ lastMessage.sentAt | date: 'dd MMM' }}
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                    <ng-container [ngSwitch]="lastMessage.senderLogin === personLogin">
+                        <ng-container *ngSwitchCase="true">
+                            Вы: {{ lastMessage.message }} - {{ lastMessage.sentAt | date: 'HH mm' }}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="false">
+                            {{lastMessage.senderLogin}}: {{ lastMessage.message }} - {{ lastMessage.sentAt | date: 'HH mm' }}
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</p>

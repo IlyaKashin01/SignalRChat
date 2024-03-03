@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { PersonResponse } from 'src/app/common/DTO/authDto';
 import { ChatService } from '../../common/services/chat.service';
 import { HubService } from 'src/app/common/services/hub.service';

@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
+import { Notification } from '../common/DTO/commonDto';
 
 @Component({
     selector: 'app-notification',
@@ -7,8 +8,7 @@ import { Subscription, interval } from 'rxjs';
     styleUrls: ['./notification.component.css']
 })
 export class NotificationComponent {
-    @Input() title: string = '';
-    @Input() message: string = '';
+    @Input() notification: Notification = new Notification("", "");
     @Input() isShow: boolean = false;
     @Output() close = new EventEmitter<void>();
     subsctibtion: Subscription;

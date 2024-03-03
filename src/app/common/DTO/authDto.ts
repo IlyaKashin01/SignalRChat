@@ -15,7 +15,6 @@ export class AuthRequest {
 export class SignUpRequest {
     constructor(
         public Login: string,
-        public Email: string,
         public Password: string
     ) { }
 }

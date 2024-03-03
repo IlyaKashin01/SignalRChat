@@ -9,6 +9,7 @@ import { GroupWingowModule } from "./groupInfoWindow/groupWindow.module";
 import { NgIconsModule } from '@ng-icons/core';
 import { featherAirplay } from '@ng-icons/feather-icons';
 import { heroUsers } from '@ng-icons/heroicons/outline';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
     declarations: [
@@ -17,6 +18,15 @@ import { heroUsers } from '@ng-icons/heroicons/outline';
     providers: [],
     bootstrap: [GroupComponent],
     exports: [GroupComponent],
-    imports: [CommonModule, BrowserModule, FormsModule, MemberFormModule, NotificationModule, GroupWingowModule, NgIconsModule.withIcons({ featherAirplay, heroUsers })]
+    imports: [
+        CommonModule, 
+        BrowserModule, 
+        FormsModule, 
+        MemberFormModule, 
+        NotificationModule, 
+        GroupWingowModule, 
+        NgIconsModule.withIcons({ featherAirplay, heroUsers }),
+        MatIconModule
+    ]
 })
 export class GroupModule { }

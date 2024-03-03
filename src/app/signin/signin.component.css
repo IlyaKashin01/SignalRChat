@@ -47,3 +47,7 @@
     display: contents;
     font-size: 16px;
   }
+
+  .errorAllert {
+    color: red;
+}

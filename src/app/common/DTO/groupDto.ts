@@ -60,6 +60,18 @@ export class LeaveGroupRequest {
         public groupId: number, 
         public personId: number,
         public personLogin: string, 
-        public creatorLogin: string
+        public creatorLogin: string,
+        public isExcluded: boolean
+    ){}
+}
+
+export class GroupParams {
+    constructor(
+    public nameGroup: string,
+    public countMembers: number,
+    public groupId: number,
+    public creatorLogin: string,
+    public personLogin: string,
+    public onlineMarkers: number[]
     ){}
 }

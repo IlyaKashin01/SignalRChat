@@ -39,6 +39,6 @@ export class GroupWindowComponent implements OnInit {
     }
 
     excludeMember(memberId: number, memberLogin: string, creatorLogin: string){
-        this.groupHub.LeaveGroup(new LeaveGroupRequest(this.groupId, memberId, memberLogin, creatorLogin));
+        this.groupHub.LeaveGroup(new LeaveGroupRequest(this.groupId, memberId, memberLogin, creatorLogin, true));
     }
 }

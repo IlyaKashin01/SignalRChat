@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PersonResponse } from 'src/app/common/DTO/authDto';
 import { GroupService } from '../../common/services/group.service';
 import { HubService } from 'src/app/common/services/hub.service';
-import { Dialog } from 'src/app/common/DTO/chatDto';
+import { Dialog } from 'src/app/common/DTO/commonDto';
 
 @Component({
     selector: 'group-form',
@@ -13,7 +13,7 @@ import { Dialog } from 'src/app/common/DTO/chatDto';
 export class GroupFormComponent implements OnInit {
     users: PersonResponse[] = [];
     @Output() closeForm = new EventEmitter<void>();
-    dialog: Dialog = new Dialog(0,"", "", false, new Date(), 0, false, 0, "");
+    dialog: Dialog = new Dialog(0,"", "", false, new Date(), 0, "", false, 0, "");
     selectedUserId: number[] = [];
     message: string = "";
     name: string = "";

@@ -1,6 +1,6 @@
-import { Component, Input, OnChanges, SimpleChanges, } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, } from '@angular/core';
 import { GroupService } from '../common/services/group.service';
-import { GroupedMessagesInGroup, LeaveGroupRequest, MemberResponse } from '../common/DTO/groupDto';
+import { GroupParams, GroupedMessagesInGroup, LeaveGroupRequest, MemberResponse } from '../common/DTO/groupDto';
 import { DataService } from '../common/services/data.service';
 import { HubService } from '../common/services/hub.service';
 
@@ -10,13 +10,15 @@ import { HubService } from '../common/services/hub.service';
     styleUrls: ['./group.component.css'],
     providers: [GroupService]
 })
-export class GroupComponent implements OnChanges {
-    @Input() nameGroup: string = "";
-    @Input() countMembers: number = 0;
-    @Input() groupId: number = 0;
-    @Input() creatorLogin: string = "";
-    @Input() personLogin: string = "";
-    @Input() onlineMarkers: number[] = [];
+export class GroupComponent implements OnInit {
+    @ViewChild('history') history!: ElementRef;
+
+    nameGroup: string = "";
+    countMembers: number = 0;
+    groupId: number = 0;
+    creatorLogin: string = "";
+    personLogin: string = "";
+    onlineMarkers: number[] = [];
 
     message: string = "";
 
@@ -34,32 +36,43 @@ export class GroupComponent implements OnChanges {
     constructor(private groupHub: GroupService, private dataService: DataService, private hubService: HubService) {
     }
 
-    async ngOnChanges(changes: SimpleChanges) {
-        if (changes['nameGroup'] || changes['groupId']) {
-            if (this.hubService.getGroupPromiseStart !== null) {
-                if (!this.isSubsctibed) {
-                    await this.groupHub.errorSubscribe();
-                    await this.groupHub.subscribeGroupMessages();
-                    await this.groupHub.subscribeNewGroupMessages();
-                    await this.groupHub.subscribeJoinPersonToGroup();
-                    await this.groupHub.subscribeMessagesWithNewStatus();
-                    await this.groupHub.subscribePersonStatus();
-                    this.groupHub.groupmessages$.subscribe((messages: GroupedMessagesInGroup[]) => {
-                        this.groupMessages = messages;
-                    });
-                    this.groupHub.status$.subscribe((status: boolean) => {
-                        this.personStatus = status;
-                    })
-                    this.groupHub.error$.subscribe((error: string) => {
-                        console.error(error);
-                    })
-                    this.isSubsctibed = true;
-                }
-                await this.groupHub.getGroupMessages(this.groupId);
+    async ngOnInit(): Promise<void> {
+        if (this.hubService.getGroupPromiseStart !== null) {
+            if (!this.isSubsctibed) {
+                await this.groupHub.errorSubscribe();
+                await this.groupHub.subscribeGroupMessages();
+                await this.groupHub.subscribeNewGroupMessages();
+                await this.groupHub.subscribeJoinPersonToGroup();
+                await this.groupHub.subscribeMessagesWithNewStatus();
+                await this.groupHub.subscribePersonStatus();
+                this.groupHub.groupmessages$.subscribe((messages: GroupedMessagesInGroup[]) => {
+                    this.groupMessages = messages;
+                });
+                this.groupHub.status$.subscribe((status: boolean) => {
+                    this.personStatus = status;
+                })
+                this.groupHub.error$.subscribe((error: string) => {
+                    if (error !== "") console.error(error);
+                })
+                this.isSubsctibed = true;
             }
         }
+        this.dataService.groupParams$.subscribe(async (params: GroupParams) => {
+            await this.groupHub.getGroupMessages(params.groupId);
+            this.nameGroup = params.nameGroup;
+            this.countMembers = params.countMembers;
+            this.groupId = params.groupId;
+            this.creatorLogin = params.creatorLogin;
+            this.personLogin = params.personLogin;
+            this.onlineMarkers = params.onlineMarkers;
+            this.scrollToBottom();
+        });
     }
-
+    scrollToBottom(): void {
+        if (this.history && this.history.nativeElement) {
+          this.history.nativeElement.scrollTop = this.history.nativeElement.scrollHeight;
+        }
+    }
     openForm() {
         this.isOpen = true;
     }
@@ -87,10 +100,14 @@ export class GroupComponent implements OnChanges {
         this.isOpen = false;
     }
     async changeStatusMessages() {
+        if(this.groupMessages.find(x => x.messages.find(x => x.isCheck === false && x.senderId === this.personId)) === null)
+        await this.dataService.setHideCounterKey(this.groupId);
         await this.groupHub.ChangeStatusIncomingMessages(this.groupId, this.nameGroup);
     }
     async leaveGroup() {
-        await this.groupHub.LeaveGroup(new LeaveGroupRequest(this.groupId, this.personId, this.personLogin, ""));
+        await this.groupHub.LeaveGroup(new LeaveGroupRequest(this.groupId, this.personId, this.personLogin, "", false));
+        console.log(this.groupId);
+        
     }
     async returnToGroup() {
         await this.groupHub.ReturnToGroup(this.groupId, this.nameGroup, this.personLogin);

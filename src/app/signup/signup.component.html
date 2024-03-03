@@ -35,18 +35,9 @@
           </div>
           <input type="password" formControlName="confirmPassword">
         </div>
-  
-        <div>
-          <label for="email">Email:</label>
-          <div class="errorAllert" *ngIf="registrationForm.get('email')!.hasError('email') && registrationForm.get('email')!.touched">
-            Пожалуйста, введите корректный адрес электронной почты.
-          </div>
-          <div class="errorAllert" *ngIf="registrationForm.get('email')!.hasError('required') && registrationForm.get('email')!.touched">
-            Поле обязательно для заполнения.
-          </div>
-          <input type="email" (keyup.enter)="signup(registrationForm)" formControlName="email">
+        <div class="errorAllert" *ngIf="showError">
+          {{errorMessage}}
         </div>
-  
         <button type="button" (click)="signup(registrationForm)">Зарегистрироваться</button>
         <button type="button" (click)="goToSignIn()" class="back-button">Назад</button>
       </form>

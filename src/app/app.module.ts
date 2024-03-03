@@ -13,10 +13,11 @@ import { HubService } from './common/services/hub.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NotificationModule } from './notification/notification.module';
 import { SignUpModule } from './signup/signup.module';
+import { LayoutModule } from './layout/layout.module';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -27,7 +28,7 @@ import { SignUpModule } from './signup/signup.module';
     GroupModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    NotificationModule
+    NotificationModule, LayoutModule
   ],
   providers: [DataService, ChatService, HubService],
   bootstrap: [AppComponent]
